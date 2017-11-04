@@ -1,4 +1,4 @@
-module.exports = function (type) {
+\module.exports = function (type) {
   Math.logab = function (exponent, base) {
     return Math.log(exponent) / Math.log(base)
   }
