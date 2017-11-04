@@ -4,8 +4,9 @@ var Connection = require('./Connection');
 
 module.exports = function () {
   this.gate = new Gate('tanh');
-  this.uuid = uuid()
-  this.connections = new Array()
+  this.uuid = uuid();
+  this.connections = new Array();
+  this.backconnections = new Array();
 
   this.matrix = {
     miu: function (m) { return m.reduce(function (a, b) {return a + b;});},
@@ -35,7 +36,8 @@ module.exports = function () {
     if (weight == true || weight == undefined) {
       weight = 2 * (Math.random() - 0.5);
     };
-    this.connections.push({neurone: neurone, weight: weight});
+    this.connections.push({neurone: neurone});
+    neurone.backconnections.push({neurone: this, weight: weight});
     /*this.connections.push(new Connection(this, neurone, weight));*/
     return this;
   };
