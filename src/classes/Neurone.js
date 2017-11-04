@@ -7,6 +7,21 @@ module.exports = function () {
   this.uuid = uuid();
   this.connections = new Array();
   this.backconnections = new Array();
+  this.biases = 0;
+
+  this.addBias = function (weighted, bias) {
+    var push = {neurone: {type: 'bias', uuid: uuid()}, dropout: false};
+    if (weighted == true) {
+      push.weight = Math.random();
+    };
+    if (typeof bias != 'number') {
+      bias = Math.random();
+    };
+    this.biases++
+    push.bias = bias;
+    this.backconnections.unshift(push);
+    return this.backconnections[0];
+  };
 
   this.matrix = {
     miu: function (m) { return m.reduce(function (a, b) {return a + b;})},
@@ -15,7 +30,7 @@ module.exports = function () {
     zeta: function (m, b) {
       for (var i = 0; i < b.length; i++) {
         if (b[i].dropout == false) {
-          m[i] *= b[i].weight;
+          b[i].weight !== undefined ? m[i] *= b[i].weight : null;
         } else {
           m[i] = 0;
         };
@@ -26,13 +41,17 @@ module.exports = function () {
 
   this.forward = function (matrix) {
 
+    for (var i = 0; i < this.biases; i++) {
+      matrix.unshift(this.backconnections[i].bias)
+    };
+
     matrix = this.matrix.zeta(matrix, this.backconnections);
     var x = this.matrix.miu(matrix);
 
-    this.cache = {miu: x, matrix: matrix}
-
     var fw = this.gate.forward(x);
     var forwards = new Array();
+
+    this.cache = {miu: x, matrix: matrix, squashed: fw}
 
     this.derivative = this.gate.derivative(x) * this.matrix.miu_prime();
 
@@ -87,7 +106,7 @@ module.exports = function () {
   this.backpropagate = function (chain, rate) {
     // backpropagates through all the backconnected weights for this neurone
     for (var i = 0; i < this.backconnections.length; i++) {
-      if (this.backconnections[i].dropout == false) {
+      if (this.backconnections[i].dropout == false && this.backconnections[i].weight !== undefined) {
         this.backconnections[i].weight -= rate * this.derivative * this.cache.matrix[i] * chain;
       };
     };
@@ -96,7 +115,7 @@ module.exports = function () {
   this.monopropagate = function (chain, rate, backconnection) {
     // backpropagates through chosen connection relative to neurone
     var index = find_backconnection(backconnection, this.backconnections);
-    if (this.backconnection[index].dropout == false) {
+    if (this.backconnection[index].dropout == false && this.backconnections[i].weight !== undefined) {
       this.backconnection[index] -= this.backconnection[index].weight -= rate * this.derivative * this.cache.matrix[i] * chain;
     };
   };
