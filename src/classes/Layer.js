@@ -1,33 +1,52 @@
 var Input = require('./Input');
 var Neurone = require('./Neurone');
+var Gate = require('./Gate');
 
-module.exports = function (type, neurones, squash) {
+module.exports = function (type) {
   this.neurones = new Array()
   if (type.toLowerCase() == 'input') {
     this.layer_type = 'input';
-    for (var i = 0; i < neurones; i++) {
-      this.neurones.push(new Input());
-    };
   } else if (type == 'hidden') {
     this.layer_type = 'hidden';
-    for (var i = 0; i < neurones; i++) {
-      this.neurones.push(new Neurone());
-    };
   };
-  if (squash !== undefined) {
-    for (var i = 0; i < this.neurones.length; i++) {
-      this.neurones[i].changeSquash(squash);
+
+  this.addNeurones = function (neurones, squash) {
+    (squash === undefined) ? squash = 'tanh' : null;
+    if (this.layer_type == 'input') {
+      for (var i = 0; i < neurones; i++) {
+        this.neurones.push(new Input().changeSquash(squash));
+      };
+    } else {
+      for (var i = 0; i < neurones; i++) {
+        this.neurones.push(new Neurone().changeSquash(squash));
+      };
     };
+    return this;
+  };
+
+  this.addGate = function (gate) {
+    if (!(gate instanceof Gate)) {
+      throw "[Neuras] Not a Gate!";
+    };
+    this.neurones.push(gate);
+    return this;
+  };
+
+  this.addGates = function (gates, gateType, options) {
+    for (var i = 0; i < gates; i++) {
+      this.neurones.push(new Gate(gateType, options));
+    };
+    return this;
   };
 
   this.addBiases = function (probability, weighted, bias) {
 
     if (this.layer_type !== 'hidden') {
-      throw "[NJS] Can only add biases to hidden Layer classes!";
+      throw "[Neuras] Can only add biases to hidden Layer classes!";
     };
 
     for (var i = 0; i < this.neurones.length; i++) {
-      if (Math.random() <= probability) {
+      if (Math.random() <= probability && this.neurones[i] instanceof Neurone) {
         this.neurones[i].addBias(weighted, bias);
       };
     };
@@ -70,7 +89,7 @@ module.exports = function (type, neurones, squash) {
 
   this.connect = function (layer, probability) {
     if (!(layer instanceof module.exports) || layer.layer_type !== 'hidden') {
-      throw "[NJS] Can only connect to hidden layers!";
+      throw "[Neuras] Can only connect to hidden layers!";
     };
 
     if (typeof probability != 'number') {
@@ -79,7 +98,7 @@ module.exports = function (type, neurones, squash) {
 
     for (var i = 0; i < this.neurones.length; i++) {
       for (var j = 0; j < layer.neurones.length; j++) {
-        if (Math.random() <= probability && (layer.neurones[j] instanceof Neurone)) {
+        if (Math.random() <= probability) {
           this.neurones[i].connect(layer.neurones[j]);
         };
       };
@@ -87,51 +106,57 @@ module.exports = function (type, neurones, squash) {
     return layer;
   };
 
-  this.forward = function (m) {
-    var output = new Array();
-    for (var i = 0; i < this.neurones.length; i++) {
-      output.push(this.neurones[i].forward(m));
+  this.connectSequentially = function (layer, probability) {
+    if (!(layer instanceof module.exports) || layer.layer_type !== 'hidden') {
+      throw "[Neuras] Can only connect to hidden layers!";
     };
-    return output;
+
+    if (typeof probability != 'number') {
+      probability = 1;
+    };
+
+    var potential_connections = Math.min(this.neurones.length, layer.neurones.length);
+
+    for (var i = 0; i < potential_connections; i++) {
+      if (Math.random() <= probability) {
+        this.neurones[i].connect(layer.neurones[i]);
+      };
+    };
+    return layer;
   };
 
-  this.getCache = function () {
+  this.getOutput = function () {
     var cache = new Array();
     for (var i = 0; i < this.neurones.length; i++) {
-      cache.push(this.neurones[i].cache.x);
+      cache.push(this.neurones[i].output);
     };
     return cache;
   };
 
-  this.initialise_chain_derivative = function () {
-    for (var i = 0; i < this.neurones.length; i++) {
-      this.neurones[i].initialise_chain_derivative();
-    };
-    return this;
-  };
-
-  this.chain_backpropagate = function () {
+  this.backpropagate = function () {
     if (this.layer_type !== 'hidden') {
-      throw "[NJS] Cannot chain backpropagate a non-hidden Layer class!";
+      throw "[Neuras] Cannot chain backpropagate a non-hidden Layer class!";
     };
-    for (var i = 0; i < this.neurones.length; i++) {
-      this.neurones[i].chain_backpropagate();
+
+    for (var i = this.neurones.length - 1; i >= 0; i--) {
+      this.neurones[i].backpropagate();
     };
+
     return this;
   };
 
-  this.continuous_forward = function (v) {
+  this.forward = function (v) {
     var output = new Array();
     if (this.layer_type === 'hidden') {
       for (var i = 0; i < this.neurones.length; i++) {
-        output.push(this.neurones[i].continuous_forward());
+        output.push(this.neurones[i].forward());
       };
     } else if (this.layer_type === 'input'){
       if (this.neurones.length !== v.length) {
-        throw "[NJS] Forward input array (length: " + v.length + ") does not equate to number of Input classes (length: " + this.neurones.length + ")!";
+        throw "[Neuras] Forward input array (length: " + v.length + ") does not equate to number of Input classes (length: " + this.neurones.length + ")!";
       };
       for (var i = 0; i < this.neurones.length; i++) {
-        output.push(this.neurones[i].continuous_forward(v[i]));
+        output.push(this.neurones[i].forward(v[i]));
       };
     };
     return output;
