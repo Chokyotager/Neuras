@@ -51,7 +51,7 @@ module.exports = function (linkage, json) {
       derivatives.push(this.derivative(expected[i], output[i])) * rate;
     };
 
-    var updated_derivatives = this.optimiser.optimise(derivatives)
+    var updated_derivatives = this.optimiser.optimise(derivatives);
 
     this.linkage.backpropagate(updated_derivatives);
 
