@@ -16,6 +16,11 @@ module.exports = function () {
 
   Object.freeze(this.meta.weighted);
 
+  this.setDerivativeChain = function (x) {
+    this.chain_derivative = x;
+    return this;
+  };
+
   this.forward = function (x) {
 
     if (x === undefined) {

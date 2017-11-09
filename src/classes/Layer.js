@@ -25,6 +25,11 @@ module.exports = function (type) {
   };
 
   this.addGate = function (gate) {
+
+    if (this.layer_type !== 'hidden') {
+      throw "[Neuras] Can only add gates to hidden Layer classes!";
+    };
+
     if (!(gate instanceof Gate)) {
       throw "[Neuras] Not a Gate!";
     };
@@ -33,6 +38,11 @@ module.exports = function (type) {
   };
 
   this.addGates = function (gates, gateType, options) {
+
+    if (this.layer_type !== 'hidden') {
+      throw "[Neuras] Can only add gates to hidden Layer classes!";
+    };
+
     for (var i = 0; i < gates; i++) {
       this.neurones.push(new Gate(gateType, options));
     };
@@ -53,8 +63,13 @@ module.exports = function (type) {
     return this;
   };
 
-  this.getNeurones = function () {
-    return this.neurones;
+  this.addLinkage = function (linkage) {
+    if (this.layer_type !== 'hidden') {
+      throw "[Neuras] Can only add linkages to hidden Layer classes!";
+    };
+
+    this.neurones.push(linkage);
+    return this;
   };
 
   this.dropoutWeights = function (probability) {
@@ -88,7 +103,7 @@ module.exports = function (type) {
   };
 
   this.connect = function (layer, probability) {
-    if (!(layer instanceof module.exports) || layer.layer_type !== 'hidden') {
+    if (!(layer instanceof module.exports)) {
       throw "[Neuras] Can only connect to hidden layers!";
     };
 
@@ -99,7 +114,15 @@ module.exports = function (type) {
     for (var i = 0; i < this.neurones.length; i++) {
       for (var j = 0; j < layer.neurones.length; j++) {
         if (Math.random() <= probability) {
-          this.neurones[i].connect(layer.neurones[j]);
+          if (layer.neurones[j].meta.type === 'linkage') {
+            if (layer.neurones[j].chronology[0].layer_type == 'hidden') {
+              this.connect(layer.neurones[j].chronology[0]);
+            } else {
+              this.connectSequentially(layer.neurones[j].chronology[0]);
+            };
+          } else {
+            this.neurones[i].connect(layer.neurones[j]);
+          };
         };
       };
     };
@@ -107,7 +130,7 @@ module.exports = function (type) {
   };
 
   this.connectSequentially = function (layer, probability) {
-    if (!(layer instanceof module.exports) || layer.layer_type !== 'hidden') {
+    if (!(layer instanceof module.exports)) {
       throw "[Neuras] Can only connect to hidden layers!";
     };
 
@@ -119,6 +142,9 @@ module.exports = function (type) {
 
     for (var i = 0; i < potential_connections; i++) {
       if (Math.random() <= probability) {
+        if (layer.neurones[i].meta.type === 'input' && layer.neurones[i].backconnections.length > 0) {
+          continue;
+        };
         this.neurones[i].connect(layer.neurones[i]);
       };
     };
@@ -128,15 +154,12 @@ module.exports = function (type) {
   this.getOutput = function () {
     var cache = new Array();
     for (var i = 0; i < this.neurones.length; i++) {
-      cache.push(this.neurones[i].output);
+      cache.push(this.neurones[i].value);
     };
     return cache;
   };
 
   this.backpropagate = function () {
-    if (this.layer_type !== 'hidden') {
-      throw "[Neuras] Cannot chain backpropagate a non-hidden Layer class!";
-    };
 
     for (var i = this.neurones.length - 1; i >= 0; i--) {
       this.neurones[i].backpropagate();
@@ -151,12 +174,20 @@ module.exports = function (type) {
       for (var i = 0; i < this.neurones.length; i++) {
         output.push(this.neurones[i].forward());
       };
-    } else if (this.layer_type === 'input'){
-      if (this.neurones.length !== v.length) {
-        throw "[Neuras] Forward input array (length: " + v.length + ") does not equate to number of Input classes (length: " + this.neurones.length + ")!";
-      };
-      for (var i = 0; i < this.neurones.length; i++) {
-        output.push(this.neurones[i].forward(v[i]));
+    } else if (this.layer_type === 'input') {
+      if (v === undefined) {
+        for (var i = 0; i < this.neurones.length; i++) {
+          var out = this.neurones[i].forward();
+
+          typeof out == 'array' ? output.concat(out) : output.push(out);
+        };
+      } else {
+        if (this.neurones.length !== v.length) {
+          throw "[Neuras] Forward input array (length: " + v.length + ") does not equate to number of Input classes (length: " + this.neurones.length + ")!";
+        };
+        for (var i = 0; i < this.neurones.length; i++) {
+          output.push(this.neurones[i].forward(v[i]));
+        };
       };
     };
     return output;

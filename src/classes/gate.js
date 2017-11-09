@@ -80,6 +80,7 @@ module.exports = function (gate, options) {
         this.type = "multiplicative";
         this.operation = function (m) {return m.reduce(function (a, b) {return a * b})};
         this.derivative = function (index, m, v) {return v/m[index]};
+        break;
 
     };
   };
@@ -111,6 +112,11 @@ module.exports = function (gate, options) {
       var derivative = this.chain_derivative * this.derivative(i, this.cache.matrix, this.value);
       this.backconnections[i].neurone.chain_derivative += derivative;
     };
+  };
+
+  this.setDerivativeChain = function (x) {
+    this.chain_derivative = x;
+    return this;
   };
 
   this.connect = function (unit, weight) {

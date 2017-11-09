@@ -88,6 +88,7 @@ module.exports = function () {
       };
       unit.backconnections.push({neurone: this, weight: weight, dropout: false});
     };
+    return this;
   };
 
   this.backpropagate = function (additiveRate) {
@@ -104,7 +105,13 @@ module.exports = function () {
       // additive rate is multiplied to the current derivative to alter the training rate of the current neurone;
       // it does not affect the neurones further back the line
       if (this.backconnections[i].dropout == false && this.backconnections[i].weight !== undefined) {
+        //this.backconnections[i].weight -= 1 / (derivative + 10e-3)
+        //this.backconnections[i].weight -= this.backconnections[i].neurone.value / (this.backconnections[i].neurone.value + 1e-360) * derivative;
+        //this.backconnections[i].weight -= derivative * this.backconnections[i].neurone.value;
+        //this.backconnections[i].weight -= loss / (derivative * this.backconnections[i].neurone.value + 10e-3);
+        //console.log(this.backconnections[i].weight/(derivative));
         this.backconnections[i].weight -= derivative * this.backconnections[i].neurone.value;
+        //this.backconnections[i].weight -= this.cache.miu[i]/(derivative * this.backconnections[i].value);
         this.backconnections[i].neurone.chain_derivative += derivative * this.backconnections[i].weight;
       } else {
         this.backconnections[i].neurone.chain_derivative += 0;
