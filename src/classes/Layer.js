@@ -159,10 +159,10 @@ module.exports = function (type) {
     return cache;
   };
 
-  this.backpropagate = function () {
+  this.backpropagate = function (loss) {
 
     for (var i = this.neurones.length - 1; i >= 0; i--) {
-      this.neurones[i].backpropagate();
+      this.neurones[i].backpropagate(1, loss);
     };
 
     return this;

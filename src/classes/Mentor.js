@@ -53,7 +53,7 @@ module.exports = function (linkage, json) {
 
     var updated_derivatives = this.optimiser.optimise(derivatives);
 
-    this.linkage.backpropagate(updated_derivatives);
+    this.linkage.backpropagate(updated_derivatives, losses[0]);
 
     return losses;
   };

@@ -52,7 +52,7 @@ module.exports = function (chronology) {
     return latest;
   };
 
-  this.backpropagate = function (chain_m) {
+  this.backpropagate = function (chain_m, loss) {
     // backpropagate output neurones
     //console.log(this.chronology[this.chronology.length - 1])
 
@@ -69,7 +69,7 @@ module.exports = function (chronology) {
     };
 
     for (var i = this.chronology.length - 1; i >= 0; i--) {
-      this.chronology[i].backpropagate();
+      this.chronology[i].backpropagate(loss);
     };
 
     return this;

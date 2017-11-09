@@ -91,7 +91,7 @@ module.exports = function () {
     return this;
   };
 
-  this.backpropagate = function (additiveRate) {
+  this.backpropagate = function (additiveRate, loss) {
 
     if (this.chain_derivative === undefined) {
       throw "[Neuras] Neurone class should have been forwarded prior to backpropagation!";
@@ -108,9 +108,9 @@ module.exports = function () {
         //this.backconnections[i].weight -= 1 / (derivative + 10e-3)
         //this.backconnections[i].weight -= this.backconnections[i].neurone.value / (this.backconnections[i].neurone.value + 1e-360) * derivative;
         //this.backconnections[i].weight -= derivative * this.backconnections[i].neurone.value;
-        //this.backconnections[i].weight -= loss / (derivative * this.backconnections[i].neurone.value + 10e-3);
+        this.backconnections[i].weight -= (loss / (-Math.sqrt(loss)*2 + 10e-30));
         //console.log(this.backconnections[i].weight/(derivative));
-        this.backconnections[i].weight -= derivative * this.backconnections[i].neurone.value;
+        //this.backconnections[i].weight -= derivative * this.backconnections[i].neurone.value;
         //this.backconnections[i].weight -= this.cache.miu[i]/(derivative * this.backconnections[i].value);
         this.backconnections[i].neurone.chain_derivative += derivative * this.backconnections[i].weight;
       } else {
