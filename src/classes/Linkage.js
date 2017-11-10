@@ -96,9 +96,6 @@ module.exports = function (chronology) {
     return unit;
   };
 
-  this.connectSequentially = function (unit, probability) {
-  };
-
   this.setDerivativeChain = function (type, layer, chain_m) {
 
     if (typeof layer !== 'number') {

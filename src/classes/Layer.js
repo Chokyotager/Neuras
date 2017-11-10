@@ -72,14 +72,77 @@ module.exports = function (type) {
     return this;
   };
 
+  this.dropoutNeurones = function (probability) {
+    var neurones = new Array();
+    for (var i = 0; i < this.neurones.length; i++) {
+      if (Math.random() <= probability && this.neurones[i] instanceof Neurone) {
+        this.neurones[i].dropout(1);
+        neurones.push(this.neurones[i]);
+      };
+    };
+    return neurones;
+  };
+
   this.dropoutWeights = function (probability) {
     var weights = new Array();
-    for (var i = 0; i < this.neurones; i++) {
+    for (var i = 0; i < this.neurones.length; i++) {
       if (this.neurones[i] instanceof Neurone) {
         weights.push(this.neurones[i].dropout(probability));
       };
     };
     return weights;
+  };
+
+  this.freezeNeurones = function (probability) {
+    var neurones = new Array();
+    for (var i = 0; i < this.neurones.length; i++) {
+      if (Math.random() <= probability && this.neurones[i] instanceof Neurone) {
+        this.neurones[i].freeze();
+        neurones.push(this.neurones[i]);
+      };
+    };
+    return neurones;
+  }
+
+  this.freezeWeights = function (probability) {
+    var weights = new Array();
+    for (var i = 0; i < this.neurones.length; i++) {
+      if (this.neurones[i] instanceof Neurone) {
+        weights.push(this.neurones[i].freeze(probability));
+      };
+    };
+    return weights;
+  }
+
+  this.unfreezeNeurones = function  (probability) {
+
+    (typeof probability !== 'number') ? probability = 1 : null;
+
+    for (var i = 0; i < this.neurones.length; i++) {
+      if (Math.random() <= probability) {
+        this.neurones[i].unfreeze();
+      };
+    };
+    return this;
+  };
+
+  this.unfreezeWeights = function  (probability) {
+
+    (typeof probability !== 'number') ? probability = 1 : null;
+
+    for (var i = 0; i < this.neurones.length; i++) {
+      this.neurones[i].unfreeze(probability);
+    };
+    return this;
+  };
+
+  this.extinguish = function () {
+    for (var i = 0; i < this.neurones; i++) {
+      if (this.neurones[i] instanceof Neurone) {
+        this.neurones[i].extinguish();
+      };
+    };
+    return this;
   };
 
   this.rekindle = function () {
@@ -89,17 +152,6 @@ module.exports = function (type) {
       };
     };
     return this;
-  };
-
-  this.dropoutNeurones = function (probability) {
-    var neurones = new Array();
-    for (var i = 0; i < this.neurones; i++) {
-      if (Math.random() <= probability && this.neurones[i] instanceof Neurone) {
-        this.neurones[i].dropout(1);
-        neurones.push(this.neurones[i]);
-      };
-    };
-    return neurones;
   };
 
   this.connect = function (layer, probability) {
@@ -128,6 +180,22 @@ module.exports = function (type) {
     };
     return layer;
   };
+
+  /*this.interconnect = function (modular, probability) {
+
+    if (typeof probability !== 'number') {
+      probability = 1;
+    };
+
+    for (var i = 0; i < this.neurones.length; i++) {
+      if (modular && Math.random() <= probability) {
+        // modular -> either fully connect to modules or not (i.e. Linkages)
+        this.connect(this);
+      } else {
+
+      };
+    };
+  };*/
 
   this.connectSequentially = function (layer, probability) {
     if (!(layer instanceof module.exports)) {

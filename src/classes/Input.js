@@ -2,7 +2,7 @@ var Squash = require('./Squash');
 var uuid = require('../libs/uuid_generator');
 
 module.exports = function () {
-  this.gate = new Squash('tanh');
+  this.squash = new Squash('tanh');
   this.uuid = uuid();
   this.connections = new Array();
   this.backconnections = new Array();
@@ -13,6 +13,7 @@ module.exports = function () {
   this.meta = new Object;
   this.meta.type = 'input';
   this.meta.weighted = false;
+  this.meta.max_connections = 1;
 
   Object.freeze(this.meta.weighted);
 
@@ -32,7 +33,7 @@ module.exports = function () {
 
     typeof x == 'array' ? x = x[0] : null;
 
-    var output = this.gate.forward(x);
+    var output = this.squash.forward(x);
     var forwards = new Array();
 
     this.chain_derivative = 0;
@@ -42,7 +43,7 @@ module.exports = function () {
   };
 
   this.changeSquash = function (sq) {
-    this.gate = new Squash(sq);
+    this.squash = new Squash(sq);
     return this;
   };
 
@@ -53,17 +54,19 @@ module.exports = function () {
       throw "[Neuras] Inappropriate connection (to) instance.";
     };
 
+    if (unit.meta.max_connections < unit.backconnections.length + 1) {
+      throw "[Neuras] Unit can only hold " + unit.meta.max_connections + " connection" + ((unit.meta.max_connections > 1) ? "s" : "") + "! Stack-trace to find unit!"
+    };
+
     if (unweightedInstance) {
-      if (unit.meta.type == 'input' && unit.backconnections.length > 0) {
-        throw "[Neuras] Input classes can only have a maximum of one backconnection!";
-      };
       unit.backconnections.push({neurone: this});
     } else {
       if (typeof weight !== 'number') {
         weight = Math.random();
       };
-      unit.backconnections.push({neurone: this, weight: weight, dropout: false});
+      unit.backconnections.push({neurone: this, weight: weight, dropout: false, frozen: false});
     };
+    return this;
   };
 
   this.backpropagate = function () {

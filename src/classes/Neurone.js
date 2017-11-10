@@ -4,7 +4,7 @@ var NMatrix = require('./NeuroneMatrix');
 //var Input = require('./Input');
 
 module.exports = function () {
-  this.gate = new Squash('tanh');
+  this.squash = new Squash('tanh');
   this.uuid = uuid();
   this.connections = new Array();
   this.backconnections = new Array();
@@ -15,22 +15,6 @@ module.exports = function () {
   this.meta = new Object();
   this.meta.weighted = true;
   this.meta.type = 'neurone';
-
-  Object.freeze(this.meta);
-
-  this.addBias = function (weighted, bias) {
-    var push = {neurone: {type: 'bias', uuid: uuid()}, dropout: false};
-    if (weighted == true) {
-      push.weight = Math.random();
-    };
-    if (typeof bias != 'number') {
-      bias = Math.random();
-    };
-    this.biases++
-    push.neurone.value = bias;
-    this.backconnections.unshift(push);
-    return this.backconnections[0];
-  };
 
   this.matrix = {
     miu: function (m) { return m.reduce(function (a, b) {return a + b;})},
@@ -49,6 +33,22 @@ module.exports = function () {
     }
   };
 
+  Object.freeze(this.meta);
+
+  this.addBias = function (weighted, bias) {
+    var push = {neurone: {type: 'bias', uuid: uuid()}, dropout: false};
+    if (weighted == true) {
+      push.weight = Math.random();
+    };
+    if (typeof bias != 'number') {
+      bias = Math.random();
+    };
+    this.biases++
+    push.neurone.value = bias;
+    this.backconnections.unshift(push);
+    return this.backconnections[0];
+  };
+
   this.forward = function () {
 
     var matrix = this.matrix.zeta(this.backconnections);
@@ -57,7 +57,7 @@ module.exports = function () {
 
     var x = this.matrix.miu(matrix);
 
-    var output = this.gate.forward(x);
+    var output = this.squash.forward(x);
 
     this.cache.miu = x;
     this.cache.matrix = matrix;
@@ -65,7 +65,7 @@ module.exports = function () {
 
     this.value = output;
 
-    this.derivative = this.gate.derivative(x) * this.matrix.miu_prime();;
+    this.derivative = this.squash.derivative(x) * this.matrix.miu_prime();;
 
     return output;
   };
@@ -77,18 +77,51 @@ module.exports = function () {
       throw "[Neuras] Inappropriate connection (to) instance.";
     };
 
+    if (unit.meta.max_connections < unit.backconnections.length + 1) {
+      throw "[Neuras] Unit can only hold " + unit.meta.max_connections + " connection" + ((unit.meta.max_connections > 1) ? "s" : "") + "! Stack-trace to find unit!"
+    };
+
     if (unweightedInstance) {
-      if (unit.meta.type == 'input' && unit.backconnections.length > 0) {
-        throw "[Neuras] Input classes can only have a maximum of one backconnection!";
-      };
       unit.backconnections.push({neurone: this});
     } else {
       if (typeof weight !== 'number') {
         weight = Math.random();
       };
-      unit.backconnections.push({neurone: this, weight: weight, dropout: false});
+      unit.backconnections.push({neurone: this, weight: weight, dropout: false, frozen: false});
     };
     return this;
+  };
+
+  this.freeze = function (probability) {
+    // freezes weights of the neurone
+    var frozen = new Array();
+    if (typeof probability !== 'number') {
+      probability = 1;
+    };
+
+    for (var i = 0; i < this.backconnections.length; i++) {
+      if (Math.random() <= probability && this.backconnections[i].weight !== undefined && this.backconnections[i].frozen == false) {
+        this.backconnections[i].frozen = true;
+        frozen.push(this.backconnections[i]);
+      };
+    };
+    return frozen;
+  };
+
+  this.unfreeze = function (probability) {
+    // freezes weights of the neurone
+    var frozen = new Array();
+    if (typeof probability !== 'number') {
+      probability = 1;
+    };
+
+    for (var i = 0; i < this.backconnections.length; i++) {
+      if (Math.random() <= probability && this.backconnections[i].weight !== undefined && this.backconnections[i].frozen == true) {
+        this.backconnections[i].frozen = false;
+        frozen.push(this.backconnections[i]);
+      };
+    };
+    return frozen;
   };
 
   this.backpropagate = function (additiveRate) {
@@ -105,13 +138,12 @@ module.exports = function () {
       // additive rate is multiplied to the current derivative to alter the training rate of the current neurone;
       // it does not affect the neurones further back the line
       if (this.backconnections[i].dropout == false && this.backconnections[i].weight !== undefined) {
-        //this.backconnections[i].weight -= 1 / (derivative + 10e-3)
-        //this.backconnections[i].weight -= this.backconnections[i].neurone.value / (this.backconnections[i].neurone.value + 1e-360) * derivative;
-        //this.backconnections[i].weight -= derivative * this.backconnections[i].neurone.value;
-        //this.backconnections[i].weight -= loss / (derivative * this.backconnections[i].neurone.value + 10e-3);
-        //console.log(this.backconnections[i].weight/(derivative));
-        this.backconnections[i].weight -= derivative * this.backconnections[i].neurone.value;
-        //this.backconnections[i].weight -= this.cache.miu[i]/(derivative * this.backconnections[i].value);
+
+        if (this.backconnections[i].frozen == false) {
+          this.backconnections[i].weight -= derivative * this.backconnections[i].neurone.value;
+        };
+
+        //update previous derivatives
         this.backconnections[i].neurone.chain_derivative += derivative * this.backconnections[i].weight;
       } else {
         this.backconnections[i].neurone.chain_derivative += 0;
@@ -121,7 +153,7 @@ module.exports = function () {
   };
 
   this.changeSquash = function (sq) {
-    this.gate = new Squash(sq);
+    this.squash = new Squash(sq);
     return this;
   };
 
