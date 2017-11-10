@@ -1,10 +1,10 @@
 var neuras = require('../src/neura');
 
 var input = new neuras.Layer('input').addNeurones(1, 'identity');
-var l11 = new neuras.Layer('hidden').addNeurones(2, 'tanh');
-var l12 = new neuras.Layer('hidden').addNeurones(2, 'tanh');
-var l13 = new neuras.Layer('hidden').addNeurones(2, 'tanh');
-var l14 = new neuras.Layer('hidden').addNeurones(2, 'tanh');
+var l11 = new neuras.Layer('hidden').addNeurones(2, 'cos');
+var l12 = new neuras.Layer('hidden').addNeurones(2, 'cos');
+var l13 = new neuras.Layer('hidden').addNeurones(6, 'cos');
+var l14 = new neuras.Layer('hidden').addNeurones(1, 'cos');
 var l2 = new neuras.Layer('hidden').addNeurones(1, 'tanh');
 
 input.connect(l11);
@@ -16,8 +16,8 @@ var mentor = new neuras.Mentor(linkage, {lossFunction: 'mean-squared'});
 
 console.log('Init: %s', linkage.forward([0.4]));
 
-for (var i = 0; i < 200; i++) {
-  var loss = mentor.train([0.6], [], 1);
+for (var i = 0; i < 10; i++) {
+  var loss = mentor.train([0.6], [0.2], 1);
   console.log(loss);
 };
 
