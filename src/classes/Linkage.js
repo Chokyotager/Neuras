@@ -1,7 +1,13 @@
 var Layer = require('./Layer');
 
-module.exports = function (chronology) {
+module.exports = function (chronology, autolink) {
   // chronology == layers to forward in order
+
+  if (autolink == true) {
+    for (var i = 0; i < chronology.length - 1; i++) {
+      chronology[i].connect(chronology[i + 1])
+    };
+  };
 
   this.meta = new Object();
   this.meta.type = 'linkage';
