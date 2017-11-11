@@ -6,5 +6,6 @@ module.exports = {
   Input: require('./classes/Input'),
   Layer: require('./classes/Layer'),
   Linkage: require('./classes/Linkage'),
-  Mentor: require('./classes/Mentor')
+  Mentor: require('./classes/Mentor'),
+  Canvas: require('./classes/Canvas')
 }
