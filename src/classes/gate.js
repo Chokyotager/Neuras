@@ -114,6 +114,46 @@ module.exports = function (gate, options) {
         };
         break;
 
+      case "constant":
+        this.type = "constant";
+        this.meta.max_connections = 0;
+        if (isNaN(parseFloat(options.constant))) {
+          throw "[Neuras] Invalid or undefined constant in constant Gate!";
+        };
+        this.cache.constant = parseFloat(options.constant);
+        this.operation = function (m) { return this.cache.constant };
+        this.derivative = function (index, m, v) {return 1};
+        break;
+
+      case "sampling":
+        this.type = "sampling";
+        this.meta.max_connections = 1;
+        this.cache.delay = 0;
+        if (isNaN(parseInt(options.sample))) {
+          throw "[Neuras] Invalid or undefined sample value in time delay Gate!";
+        };
+        this.cache.sample = parseInt(options.sample);
+        this.cache.sample_fired = false;
+        this.operation = function (m) {
+          this.cache.delay++
+          if (this.cache.delay >= this.cache.sample) {
+            this.cache.sample_fired = true;
+            this.cache.delay = 0;
+            return m;
+          } else {
+            this.cache.sample_fired = false;
+            return 0;
+          };
+        };
+        this.derivative = function (index, m, v) {
+          if (this.cache.sample_fired) {
+            return 1;
+          } else {
+            return 0;
+          };
+        };
+        break;
+
       case "multiplicative":
         this.type = "multiplicative";
         this.operation = function (m) {return m.reduce(function (a, b) {return a * b})};
