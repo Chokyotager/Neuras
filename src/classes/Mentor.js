@@ -1,7 +1,13 @@
 var Optimiser = require('./Optimiser');
 
 module.exports = function (linkage, json) {
-  switch (json.lossFunction.toLowerCase()) {
+
+  typeof json !== 'object' ? json = new Object() : null;
+
+  var lossFunction = new String();
+  typeof json.lossFunction !== 'string' ? lossFunction = json.lossFunction : lossFunction = json.lossFunction.toString();
+
+  switch (json.lossFunction) {
     case "mean-squared":
       this.evaluate = function (y, yhat) {return 1/2 * Math.pow((y - yhat), 2)};
       this.derivative = function (y, yhat) {return -(y - yhat)};

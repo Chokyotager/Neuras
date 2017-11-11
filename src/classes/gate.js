@@ -125,6 +125,7 @@ module.exports = function (gate, options) {
         this.derivative = function (index, m, v) {return 1};
         break;
 
+      //
       case "sampling":
         this.type = "sampling";
         this.meta.max_connections = 1;
