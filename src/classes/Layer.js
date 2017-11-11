@@ -72,6 +72,17 @@ module.exports = function (type) {
     return this;
   };
 
+  // TEMPORARY
+  this.addUnits = function (units) {
+    for (var i = 0; i < units.length; i++) {
+      if (units[i].meta === undefined) {
+        throw "[Neuras] Invalid unit! (Index: " + i.toString() + ")";
+      };
+    };
+    this.neurones = this.neurones.concat(units);
+    return this;
+  };
+
   this.dropoutNeurones = function (probability) {
     var neurones = new Array();
     for (var i = 0; i < this.neurones.length; i++) {
@@ -240,14 +251,16 @@ module.exports = function (type) {
     var output = new Array();
     if (this.layer_type === 'hidden') {
       for (var i = 0; i < this.neurones.length; i++) {
-        output.push(this.neurones[i].forward());
+        var out = this.neurones[i].forward();
+
+        (out instanceof Array) ? output = output.concat(out) : output.push(out);
       };
     } else if (this.layer_type === 'input') {
       if (v === undefined) {
         for (var i = 0; i < this.neurones.length; i++) {
           var out = this.neurones[i].forward();
 
-          typeof out == 'array' ? output.concat(out) : output.push(out);
+          (out instanceof Array) ? output = output.concat(out) : output.push(out);
         };
       } else {
         if (this.neurones.length !== v.length) {

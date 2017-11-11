@@ -3,6 +3,10 @@ var Squash = require('./Squash');
 module.exports = function (gate, options) {
   // Non-neuronal matrix gates, cannot be weighted
 
+  if (options === undefined) {
+    options = new Object;
+  };
+
   this.backconnections = new Array();
   this.connections = new Array();
   this.value = 0;
