@@ -29,6 +29,25 @@ module.exports = function (gate, options) {
   // Gate enumeration
   if (typeof gate == "string") {
     switch (gate) {
+
+      case "softmax":
+        this.type = "softmax";
+        this.operation = function (m) {
+          var divisor = 0;
+          for (var i = 0; i < m.length; i++) {
+            divisor += Math.pow(Math.E, m[i]);
+          };
+          return Math.pow(Math.E, m[0]) / divisor;
+        };
+        this.derivative = function (index, m, v) {
+          if (index === 0) {
+            return this.value * (1 - this.value);
+          } else {
+            return 0;
+          };
+        };
+        break;
+
       case "spike":
         this.type = "spike";
         this.cache.spike = 0;
@@ -237,6 +256,17 @@ module.exports = function (gate, options) {
           };
           unit.backconnections.push({neurone: this, weight: weight, dropout: false, frozen: false});
         };
+    return this;
+  };
+
+  this.disconnectDuplicates = function () {
+    for (var i = 0; i < this.backconnections.length - 1; i++) {
+      for (var j = this.backconnections.length - 1; j > i; j--) {
+        if (this.backconnections[j].neurone === this.backconnections[i].neurone) {
+          this.backconnections.splice(j, 1);
+        };
+      };
+    };
     return this;
   };
 

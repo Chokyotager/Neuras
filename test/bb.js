@@ -8,7 +8,7 @@ console.log('Hi');
 
 mentor.setOptimiser('compound-momentum');
 
-for (var i = 0; i < 1000; i++) {
+for (var i = 0; i < 10; i++) {
   var losses = mentor.train([0.3], [0.6], 0.4);
   console.log(losses);
 }

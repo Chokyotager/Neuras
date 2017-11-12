@@ -1,6 +1,7 @@
 var Input = require('./Input');
 var Neurone = require('./Neurone');
 var Gate = require('./Gate');
+var Buffer = require('./Buffer');
 
 module.exports = function (type) {
   this.neurones = new Array()
@@ -34,6 +35,13 @@ module.exports = function (type) {
       throw "[Neuras] Not a Gate!";
     };
     this.neurones.push(gate);
+    return this;
+  };
+
+  this.addBuffers = function (buffers) {
+    for (var i = 0; i < buffers; i++) {
+      this.neurones.push(new Buffer());
+    };
     return this;
   };
 
@@ -72,7 +80,6 @@ module.exports = function (type) {
     return this;
   };
 
-  // TEMPORARY
   this.addUnits = function (units) {
     for (var i = 0; i < units.length; i++) {
       if (units[i].meta === undefined) {
@@ -131,7 +138,9 @@ module.exports = function (type) {
 
     for (var i = 0; i < this.neurones.length; i++) {
       if (Math.random() <= probability) {
-        this.neurones[i].unfreeze();
+        if (this.neurones[i] instanceof Neurone) {
+          this.neurones[i].unfreeze();
+        };
       };
     };
     return this;
@@ -142,7 +151,9 @@ module.exports = function (type) {
     (typeof probability !== 'number') ? probability = 1 : null;
 
     for (var i = 0; i < this.neurones.length; i++) {
-      this.neurones[i].unfreeze(probability);
+      if (this.neurones[i] instanceof Neurone) {
+        this.neurones[i].unfreeze(probability);
+      };
     };
     return this;
   };
@@ -207,6 +218,15 @@ module.exports = function (type) {
       };
     };
   };*/
+
+  this.disconnectDuplicates = function () {
+    for (var i = 0; i < this.neurones.length; i++) {
+      if (this.neurones[i].meta.type !== 'input') {
+        this.neurones[i].disconnectDuplicates();
+      };
+    };
+    return this;
+  };
 
   this.connectSequentially = function (layer, probability) {
     if (!(layer instanceof module.exports)) {

@@ -102,6 +102,11 @@ module.exports = function (chronology, autolink) {
     return unit;
   };
 
+  this.disconnectDuplicates = function () {
+    this.chronology[0].disconnectDuplicates();
+    return this;
+  };
+
   this.setDerivativeChain = function (type, layer, chain_m) {
 
     if (typeof layer !== 'number') {

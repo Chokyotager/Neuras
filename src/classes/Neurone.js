@@ -193,6 +193,17 @@ module.exports = function () {
     };
   };
 
+  this.disconnectDuplicates = function () {
+    for (var i = 0; i < this.backconnections.length - 1; i++) {
+      for (var j = this.backconnections.length - 1; j > i; j--) {
+        if (this.backconnections[j].neurone === this.backconnections[i].neurone) {
+          this.backconnections.splice(j, 1);
+        };
+      };
+    };
+    return this;
+  };
+
   this.setDerivativeChain = function (x) {
     this.chain_derivative = x;
     return this;

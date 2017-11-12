@@ -13,6 +13,11 @@ module.exports = function (linkage, json) {
       this.derivative = function (y, yhat) {return -(y - yhat)};
       break;
 
+    case "cross-entropy":
+      this.evaluate = function (y, yhat) {return 0};
+      this.derivative = function (y, yhat) {return (yhat - y)};
+      break;
+
     case "linear":
       this.evaluate = function (y, yhat) {return y - yhat};
       this.derivative = function (y, yhat) {return -1};
