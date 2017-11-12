@@ -58,14 +58,18 @@ module.exports = function () {
       throw "[Neuras] Unit can only hold " + unit.meta.max_connections + " connection" + ((unit.meta.max_connections > 1) ? "s" : "") + "! Stack-trace to find unit!"
     };
 
-    if (unweightedInstance) {
-      unit.backconnections.push({neurone: this});
-    } else {
-      if (typeof weight !== 'number') {
-        weight = Math.random();
+    if (unit.meta.type === 'buffer') {
+      for (var i = 0; i < unit.connections.length; i++) {
+        this.connect(unit.connections[i], weight);
       };
-      unit.backconnections.push({neurone: this, weight: weight, dropout: false, frozen: false});
-    };
+    } else if (unweightedInstance) {
+          unit.backconnections.push({neurone: this});
+        } else {
+          if (typeof weight !== 'number') {
+            weight = Math.random();
+          };
+          unit.backconnections.push({neurone: this, weight: weight, dropout: false, frozen: false});
+        };
     return this;
   };
 
