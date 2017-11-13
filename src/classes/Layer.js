@@ -250,6 +250,16 @@ module.exports = function (type) {
     return layer;
   };
 
+  this.connectRespectively = function (layer) {
+    if (!(layer instanceof module.exports)) {
+      throw "[Neuras] Can only connect to hidden layers!";
+    };
+    this.connectSequentially(layer);
+    this.connect(layer);
+    layer.disconnectDuplicates();
+    return this;
+  }
+
   this.getOutput = function () {
     var cache = new Array();
     for (var i = 0; i < this.neurones.length; i++) {
