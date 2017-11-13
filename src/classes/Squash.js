@@ -45,6 +45,11 @@ module.exports = function (type) {
     this.derivative = function (x) {return (x === 0) ? 0 : Math.cos(x)/x - Math.sin(x)/Math.pow(x, 2)};
     break;
 
+    case "binary-step":
+    this.evaluate = function (x) {return (x < 0) ? 0 : 1};
+    this.derivative = function (x) {return (x === 0) ? 10e30 : 0};
+    break;
+
     case "relu":
     this.evaluate = function (x) {if (x >= 0) {return x} else {return 0}};
     this.derivative = function (x) {if (x >= 0) {return 1} else {return 0}};
