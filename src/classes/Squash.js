@@ -40,6 +40,11 @@ module.exports = function (type) {
     this.derivative = function (x) {return 2 * x};
     break;
 
+    case "sinc":
+    this.evaulate = function (x) {return (x === 0) ? 1 : Math.sin(x)/x};
+    this.derivative = function (x) {return (x === 0) ? 0 : Math.cos(x)/x - Math.sin(x)/Math.pow(x, 2)};
+    break;
+
     case "relu":
     this.evaluate = function (x) {if (x >= 0) {return x} else {return 0}};
     this.derivative = function (x) {if (x >= 0) {return 1} else {return 0}};
