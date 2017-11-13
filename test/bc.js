@@ -17,8 +17,9 @@ var mentor = new neuras.Mentor(linkage, {lossFunction: 'mean-squared'});
 var fw = linkage.forward([0.3]);
 console.log(fw);
 
-for (var i = 0; i < 10000; i++) {
-  mentor.train([0.3], [0, 1], 0.4);
+for (var i = 0; i < 10; i++) {
+  var loss = mentor.train([0.3], [0, 1], 0.4);
+  console.log(loss);
 }
 
 var fw = linkage.forward([0.3]);

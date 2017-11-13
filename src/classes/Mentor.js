@@ -14,7 +14,7 @@ module.exports = function (linkage, json) {
       break;
 
     case "cross-entropy":
-      this.evaluate = function (y, yhat) {return 0};
+      this.evaluate = function (y, yhat) {return -y * Math.log(yhat + 10e-30)};
       this.derivative = function (y, yhat) {return (yhat - y)};
       break;
 
