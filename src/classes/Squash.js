@@ -25,6 +25,11 @@ module.exports = function (type) {
     this.derivative = function (x) {return 1/(3 * Math.pow(x, 2/3))};
     break;
 
+    case "leaky-relu":
+    this.evaluate = function (x) {return (x < 0) ? x*0.01 : x};
+    this.derivative = function (x) {return (x < 0) ? 0.01 : 1};
+    break;
+
     case "cube":
     this.evaluate = function (x) {return Math.pow(x, 3)};
     this.derivative = function (x) {return 3 * Math.pow(x, 2)};
