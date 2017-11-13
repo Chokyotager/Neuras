@@ -20,6 +20,11 @@ module.exports = function (type) {
     this.derivative = function (x) {return Math.pow(Math.E, x) / Math.pow((Math.pow(Math.E, x) + 1), 2)};
     break;
 
+    case "hard-tanh":
+    this.evaluate = function (x) {return (x <= 1 && x >= -1) ? x : x/Math.abs(x)};
+    this.derivative = function (x) {return (x <= 1 && x >= 1) ? 1 : 0};
+    break;
+
     case "cube-root":
     this.evaluate = function (x) {return Math.cbrt(x)};
     this.derivative = function (x) {return 1/(3 * Math.pow(x, 2/3))};
