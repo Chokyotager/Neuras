@@ -48,6 +48,24 @@ module.exports = function (gate, options) {
         };
         break;
 
+      case "hardmax":
+        this.type = "hardmax";
+        this.operation = function (m) {
+          var divisor = 0;
+          for (var i = 0; i < m.length; i++) {
+            divisor += m[i];
+          };
+          return m[0] / divisor;
+        };
+        this.derivative = function (index, m, v) {
+          if (index === 0) {
+            return 1;
+          } else {
+            return 0;
+          };
+        };
+        break;
+
       case "spike":
         this.type = "spike";
         this.cache.spike = 0;
