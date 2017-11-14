@@ -25,10 +25,6 @@ module.exports = function (chronology, autolink) {
       throw "[Neuras] Element (index: " + i.toString() + ") is not a Layer class!";
     };
 
-    if (chronology[i].layer_type === 'input' && i > 0) {
-      throw "[Neuras] Cannot have Input layers within a Linkage! Use a secondary Linkage instead!"
-    };
-
     var layerconf = [0, 0];
 
     for (var j = 0; j < chronology[i].neurones.length; j++) {
@@ -44,11 +40,11 @@ module.exports = function (chronology, autolink) {
   };
 
   this.forward = function (m) {
-
-    if (m !== undefined) {
-      this.chronology[0].forward(m);
-    } else {
+    
+    if (m === undefined) {
       this.chronology[0].forward();
+    } else {
+      this.chronology[0].forward(m);
     };
 
     // forward hidden

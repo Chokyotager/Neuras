@@ -1,35 +1,19 @@
-var Input = require('./Input');
 var Neurone = require('./Neurone');
 var Gate = require('./Gate');
 var Buffer = require('./Buffer');
 
-module.exports = function (type) {
+module.exports = function () {
   this.neurones = new Array()
-  if (type.toLowerCase() == 'input') {
-    this.layer_type = 'input';
-  } else if (type == 'hidden') {
-    this.layer_type = 'hidden';
-  };
 
   this.addNeurones = function (neurones, squash) {
     (squash === undefined) ? squash = 'tanh' : null;
-    if (this.layer_type == 'input') {
-      for (var i = 0; i < neurones; i++) {
-        this.neurones.push(new Input().changeSquash(squash));
-      };
-    } else {
-      for (var i = 0; i < neurones; i++) {
-        this.neurones.push(new Neurone().changeSquash(squash));
-      };
+    for (var i = 0; i < neurones; i++) {
+      this.neurones.push(new Neurone().changeSquash(squash));
     };
     return this;
   };
 
   this.addGate = function (gate) {
-
-    if (this.layer_type !== 'hidden') {
-      throw "[Neuras] Can only add gates to hidden Layer classes!";
-    };
 
     if (!(gate instanceof Gate)) {
       throw "[Neuras] Not a Gate!";
@@ -47,10 +31,6 @@ module.exports = function (type) {
 
   this.addGates = function (gates, gateType, options) {
 
-    if (this.layer_type !== 'hidden') {
-      throw "[Neuras] Can only add gates to hidden Layer classes!";
-    };
-
     for (var i = 0; i < gates; i++) {
       this.neurones.push(new Gate(gateType, options));
     };
@@ -58,10 +38,6 @@ module.exports = function (type) {
   };
 
   this.addBiases = function (probability, weighted, bias) {
-
-    if (this.layer_type !== 'hidden') {
-      throw "[Neuras] Can only add biases to hidden Layer classes!";
-    };
 
     for (var i = 0; i < this.neurones.length; i++) {
       if (Math.random() <= probability && this.neurones[i] instanceof Neurone) {
@@ -72,9 +48,6 @@ module.exports = function (type) {
   };
 
   this.addLinkage = function (linkage) {
-    if (this.layer_type !== 'hidden') {
-      throw "[Neuras] Can only add linkages to hidden Layer classes!";
-    };
 
     this.neurones.push(linkage);
     return this;
@@ -178,10 +151,10 @@ module.exports = function (type) {
 
   this.connect = function (layer, probability) {
     if (!(layer instanceof module.exports)) {
-      throw "[Neuras] Can only connect to hidden layers!";
+      throw "[Neuras] Can only connect to Layer classes!";
     };
 
-    if (typeof probability != 'number') {
+    if (typeof probability !== 'number') {
       probability = 1;
     };
 
@@ -189,11 +162,7 @@ module.exports = function (type) {
       for (var j = 0; j < layer.neurones.length; j++) {
         if (Math.random() <= probability) {
           if (layer.neurones[j].meta.type === 'linkage') {
-            if (layer.neurones[j].chronology[0].layer_type == 'hidden') {
-              this.connect(layer.neurones[j].chronology[0]);
-            } else {
-              this.connectSequentially(layer.neurones[j].chronology[0]);
-            };
+            this.connect(layer.neurones[j].chronology[0]);
           } else {
             this.neurones[i].connect(layer.neurones[j]);
           };
@@ -203,25 +172,9 @@ module.exports = function (type) {
     return layer;
   };
 
-  /*this.interconnect = function (modular, probability) {
-
-    if (typeof probability !== 'number') {
-      probability = 1;
-    };
-
-    for (var i = 0; i < this.neurones.length; i++) {
-      if (modular && Math.random() <= probability) {
-        // modular -> either fully connect to modules or not (i.e. Linkages)
-        this.connect(this);
-      } else {
-
-      };
-    };
-  };*/
-
   this.disconnectDuplicates = function () {
     for (var i = 0; i < this.neurones.length; i++) {
-      if (this.neurones[i].meta.type !== 'input') {
+      if (this.neurones[i].meta.type !== 'gate') {
         this.neurones[i].disconnectDuplicates();
       };
     };
@@ -230,7 +183,7 @@ module.exports = function (type) {
 
   this.connectSequentially = function (layer, probability) {
     if (!(layer instanceof module.exports)) {
-      throw "[Neuras] Can only connect to hidden layers!";
+      throw "[Neuras] Can only connect to Layer classes!";
     };
 
     if (typeof probability != 'number') {
@@ -241,9 +194,6 @@ module.exports = function (type) {
 
     for (var i = 0; i < potential_connections; i++) {
       if (Math.random() <= probability) {
-        if (layer.neurones[i].meta.type === 'input' && layer.neurones[i].backconnections.length > 0) {
-          continue;
-        };
         this.neurones[i].connect(layer.neurones[i]);
       };
     };
@@ -252,7 +202,7 @@ module.exports = function (type) {
 
   this.connectRespectively = function (layer) {
     if (!(layer instanceof module.exports)) {
-      throw "[Neuras] Can only connect to hidden layers!";
+      throw "[Neuras] Can only connect to Layer classes!";
     };
     this.connectSequentially(layer);
     this.connect(layer);
@@ -279,13 +229,6 @@ module.exports = function (type) {
 
   this.forward = function (v) {
     var output = new Array();
-    if (this.layer_type === 'hidden') {
-      for (var i = 0; i < this.neurones.length; i++) {
-        var out = this.neurones[i].forward();
-
-        (out instanceof Array) ? output = output.concat(out) : output.push(out);
-      };
-    } else if (this.layer_type === 'input') {
       if (v === undefined) {
         for (var i = 0; i < this.neurones.length; i++) {
           var out = this.neurones[i].forward();
@@ -294,12 +237,15 @@ module.exports = function (type) {
         };
       } else {
         if (this.neurones.length !== v.length) {
-          throw "[Neuras] Forward input array (length: " + v.length + ") does not equate to number of Input classes (length: " + this.neurones.length + ")!";
+          throw "[Neuras] Forward input array (length: " + v.length + ") does not equate to number of Neurone classes in Layer (length: " + this.neurones.length + ")!";
         };
         for (var i = 0; i < this.neurones.length; i++) {
-          output.push(this.neurones[i].forward(v[i]));
+          if (this.neurones[i].meta.type === 'linkage') {
+            output.push(this.neurones[i].forward(v));
+          } else {
+            output.push(this.neurones[i].forward(v[i]));
+          };
         };
-      };
     };
     return output;
   };

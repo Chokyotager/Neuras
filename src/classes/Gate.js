@@ -8,7 +8,6 @@ module.exports = function (gate, options) {
   };
 
   this.backconnections = new Array();
-  this.connections = new Array();
   this.value = 0;
   this.chain_derivative = 0;
   this.options = options;
@@ -197,6 +196,7 @@ module.exports = function (gate, options) {
 
       case "multiplicative":
         this.type = "multiplicative";
+        this.value = 1;
         this.operation = function (m) {return m.reduce(function (a, b) {return a * b})};
         this.derivative = function (index, m, v) {return v/m[index]};
         break;
@@ -220,6 +220,13 @@ module.exports = function (gate, options) {
     for (var i = 0; i < this.backconnections.length; i++) {
       // No respect to order, but run from top to bottom of Layer anyway
       // No weights
+
+      // TEMPORARY!!!! NOTE THIS
+      /*if (this.backconnections[i].neurone.value === 0) {
+        var def = 10e-30;
+      } else {
+        var def = this.backconnections[i].neurone.value;
+      };*/
       parse.push(this.backconnections[i].neurone.value);
     };
 

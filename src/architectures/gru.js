@@ -10,11 +10,12 @@ module.exports = function (layers, selfconnect) {
   for (var i = 0; i < layers.length; i++) {
     var current = new Layer();
     for (var j = 0; j < layers[i]; j++) {
-      current.addLinkage(new Canvas.LSTM());
+      current.addLinkage(new Canvas.GRU());
     };
     // Self-connect
     if (selfconnect) {
       current.connect(current);
+      current.disconnectDuplicates();
     };
     layered.push(current);
   };

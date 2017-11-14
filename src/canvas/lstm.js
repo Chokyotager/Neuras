@@ -14,7 +14,7 @@ module.exports = function () {
   var forget = new Neurone().changeSquash('logistic');
 
   var output = new Neurone().changeSquash('logistic');
-  var output_buffer = new Buffer().connect(output);
+  var buffer = new Buffer().connect(output).connect(entrance).connect(input).connect(forget);
 
   var ei_multiplicative = new Gate('multiplicative');
   var f_multiplicative = new Gate('multiplicative');
@@ -35,14 +35,15 @@ module.exports = function () {
   central_additive.connect(input).connect(forget).connect(output).connect(central_squash);
   central_squash.connect(co_multiplicative);
 
-  var one = new Layer('hidden').addUnits([entrance, input, forget, output_buffer]);
-  var two = new Layer('hidden').addUnits([ei_multiplicative, f_multiplicative]);
-  var three = new Layer('hidden').addUnits([central_additive, central_squash]);
-  var four = new Layer('hidden').addUnits([output]);
-  var five = new Layer('hidden').addUnits([co_multiplicative])
+  var one = new Layer().addUnits([buffer]);
+  var one_point_five = new Layer().addUnits([entrance, input, forget])
+  var two = new Layer().addUnits([ei_multiplicative, f_multiplicative]);
+  var three = new Layer().addUnits([central_additive, central_squash]);
+  var four = new Layer().addUnits([output]);
+  var five = new Layer().addUnits([co_multiplicative])
 
-  //console.log(new Layer('hidden').addUnits([central_additive, central_squash]));
+  //console.log(new Layer().addUnits([central_additive, central_squash]));
 
-  return new Linkage([one, two, three, four]);
+  return new Linkage([one, one_point_five, two, three, four]);
 
 };

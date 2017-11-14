@@ -1,6 +1,6 @@
 var neuras = require('../src/neura');
 
-var linkage = new neuras.Architecture.LSTM([1, 1, 3, 1], true);
+var linkage = new neuras.Canvas.GRU();
 
 var mentor = new neuras.Mentor(linkage);
 
@@ -8,9 +8,11 @@ console.log('Hi');
 
 mentor.setOptimiser('compound-momentum');
 
-for (var i = 0; i < 10; i++) {
+console.log(linkage.forward([0.3]));
+
+for (var i = 0; i < 100; i++) {
   var losses = mentor.train([0.3], [0.6], 0.4);
   console.log(losses);
 }
 
-console.log('End');
+console.log(linkage.forward([0.3]));

@@ -6,7 +6,6 @@ var NMatrix = require('./NeuroneMatrix');
 module.exports = function () {
   this.squash = new Squash('tanh');
   this.uuid = uuid();
-  this.connections = new Array();
   this.backconnections = new Array();
   this.biases = 0;
   this.cache = new Object();
@@ -49,13 +48,15 @@ module.exports = function () {
     return this.backconnections[0];
   };
 
-  this.forward = function () {
+  this.forward = function (x) {
 
-    var matrix = this.matrix.zeta(this.backconnections);
+    if (x === undefined) {
+      var matrix = this.matrix.zeta(this.backconnections);
 
-    matrix.length == 0 ? matrix[0] = 0 : null;
+      matrix.length == 0 ? matrix[0] = 0 : null;
 
-    var x = this.matrix.miu(matrix);
+      x = this.matrix.miu(matrix);
+    };
 
     var output = this.squash.forward(x);
 
