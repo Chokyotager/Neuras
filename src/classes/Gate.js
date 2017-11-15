@@ -23,7 +23,7 @@ module.exports = function (gate, options) {
     this.squash = new Squash('identity');
   };
 
-  Object.freeze(this.meta);
+  //Object.freeze(this.meta);
 
   // Gate enumeration
   if (typeof gate == "string") {
@@ -215,6 +215,29 @@ module.exports = function (gate, options) {
     return this;
   };
 
+  this.limitConnections = function (connections) {
+    if (connections < this.backconnections.length) {
+      throw "[Neuras] Cannot lower backconnection limits than already existing number of connections!";
+    };
+
+    if (typeof connections !== 'number' || connections < 0) {
+      throw "[Neuras] Invalid limit on connections!";
+    };
+
+    this.meta.max_connections = connections;
+    return this;
+  };
+
+  this.lock = function () {
+    this.meta.max_connections = this.backconnections.length;
+    return this;
+  };
+
+  this.unlock = function () {
+    this.meta.max_connections = Infinity;
+    return this;
+  };
+
   this.forward = function () {
     var parse = new Array();
     for (var i = 0; i < this.backconnections.length; i++) {
@@ -266,7 +289,7 @@ module.exports = function (gate, options) {
     };
 
     if (unit.meta.max_connections < unit.backconnections.length + 1) {
-      throw "[Neuras] Unit can only hold " + unit.meta.max_connections + " connection" + ((unit.meta.max_connections > 1) ? "s" : "") + "! Stack-trace to find unit!"
+      throw "[Neuras] Unit can only hold " + unit.meta.max_connections + " connection" + ((unit.meta.max_connections !== 1) ? "s" : "") + "! Stack-trace to find unit!"
     };
 
     if (unit.meta.type === 'buffer') {
@@ -282,6 +305,10 @@ module.exports = function (gate, options) {
           unit.backconnections.push({neurone: this, weight: weight, dropout: false, frozen: false});
         };
     return this;
+  };
+
+  this.getUnsquashedOutput = function () {
+    return this.cache.miu;
   };
 
   this.disconnectDuplicates = function () {

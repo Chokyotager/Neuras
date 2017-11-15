@@ -32,7 +32,30 @@ module.exports = function () {
     }
   };
 
-  Object.freeze(this.meta);
+  //Object.freeze(this.meta);
+
+  this.limitConnections = function (connections) {
+    if (connections < this.backconnections.length) {
+      throw "[Neuras] Cannot lower backconnection limits than already existing number of connections!";
+    };
+
+    if (typeof connections !== 'number' || connections < 0) {
+      throw "[Neuras] Invalid limit on connections!";
+    };
+
+    this.meta.max_connections = connections;
+    return this;
+  };
+
+  this.lock = function () {
+    this.meta.max_connections = this.backconnections.length;
+    return this;
+  };
+
+  this.unlock = function () {
+    this.meta.max_connections = Infinity;
+    return this;
+  };
 
   this.addBias = function (weighted, bias) {
     var push = {neurone: {type: 'bias', uuid: uuid()}, dropout: false};
@@ -79,7 +102,7 @@ module.exports = function () {
     };
 
     if (unit.meta.max_connections < unit.backconnections.length + 1) {
-      throw "[Neuras] Unit can only hold " + unit.meta.max_connections + " connection" + ((unit.meta.max_connections > 1) ? "s" : "") + "! Stack-trace to find unit!"
+      throw "[Neuras] Unit can only hold " + unit.meta.max_connections + " connection" + ((unit.meta.max_connections !== 1) ? "s" : "") + "! Stack-trace to find unit!"
     };
 
     if (unit.meta.type === 'buffer') {
@@ -99,10 +122,9 @@ module.exports = function () {
 
   this.freeze = function (probability) {
     // freezes weights of the neurone
+
     var frozen = new Array();
-    if (typeof probability !== 'number') {
-      probability = 1;
-    };
+    (typeof probability !== 'number') ? probability = 1 : null;
 
     for (var i = 0; i < this.backconnections.length; i++) {
       if (Math.random() <= probability && this.backconnections[i].weight !== undefined && this.backconnections[i].frozen == false) {
@@ -116,9 +138,7 @@ module.exports = function () {
   this.unfreeze = function (probability) {
     // freezes weights of the neurone
     var frozen = new Array();
-    if (typeof probability !== 'number') {
-      probability = 1;
-    };
+    (typeof probability !== 'number') ? probability = 1 : null;
 
     for (var i = 0; i < this.backconnections.length; i++) {
       if (Math.random() <= probability && this.backconnections[i].weight !== undefined && this.backconnections[i].frozen == true) {
@@ -127,6 +147,10 @@ module.exports = function () {
       };
     };
     return frozen;
+  };
+
+  this.getUnsquashedOutput = function () {
+    return this.cache.miu;
   };
 
   this.backpropagate = function (additiveRate) {

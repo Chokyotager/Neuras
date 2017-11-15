@@ -13,6 +13,18 @@ module.exports = function () {
     return this;
   };
 
+  this.lock = function () {
+    for (var i = 0; i < this.neurones.length; i++) {
+      this.neurones[i].lock();
+    };
+  };
+
+  this.unlock = function () {
+    for (var i = 0; i < this.neurones.length; i++) {
+      this.neurones[i].unlock();
+    };
+  };
+
   this.addGate = function (gate) {
 
     if (!(gate instanceof Gate)) {
@@ -85,6 +97,9 @@ module.exports = function () {
   };
 
   this.freezeNeurones = function (probability) {
+
+    (typeof probability !== 'number') ? probability = 1 : null;
+
     var neurones = new Array();
     for (var i = 0; i < this.neurones.length; i++) {
       if (Math.random() <= probability && this.neurones[i] instanceof Neurone) {
@@ -96,6 +111,9 @@ module.exports = function () {
   }
 
   this.freezeWeights = function (probability) {
+
+    (typeof probability !== 'number') ? probability = 1 : null;
+
     var weights = new Array();
     for (var i = 0; i < this.neurones.length; i++) {
       if (this.neurones[i] instanceof Neurone) {
@@ -227,21 +245,43 @@ module.exports = function () {
     return this;
   };
 
+  this.getUnsquashedOutput = function () {
+    var ret = new Array();
+    for (var i = 0; i < this.neurones.length; i++) {
+      var out = this.neurones[i].getUnsquashedOutput();
+      Array.isArray(out) ? ret = ret.concat(out) : ret.push(out);
+    };
+    return ret;
+  };
+
+  this.getInputCount = function () {
+    var count = 0;
+    for (var i = 0; i < this.neurones.length; i++) {
+      if (this.neurones[i].meta.type === 'linkage') {
+        count += this.neurones[i].configuration[0][0];
+      } else {
+        count++;
+      };
+    };
+    return count;
+  };
+
   this.forward = function (v) {
     var output = new Array();
       if (v === undefined) {
         for (var i = 0; i < this.neurones.length; i++) {
           var out = this.neurones[i].forward();
 
-          (out instanceof Array) ? output = output.concat(out) : output.push(out);
+          Array.isArray(out) ? output = output.concat(out) : output.push(out);
         };
       } else {
-        if (this.neurones.length !== v.length) {
+        if (this.getInputCount() !== v.length) {
           throw "[Neuras] Forward input array (length: " + v.length + ") does not equate to number of Neurone classes in Layer (length: " + this.neurones.length + ")!";
         };
         for (var i = 0; i < this.neurones.length; i++) {
           if (this.neurones[i].meta.type === 'linkage') {
-            output.push(this.neurones[i].forward(v));
+            var x = this.neurones[i].configuration[0][0];
+            output.push(this.neurones[i].forward(v.slice(i, i+x)));
           } else {
             output.push(this.neurones[i].forward(v[i]));
           };

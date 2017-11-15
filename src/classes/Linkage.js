@@ -13,10 +13,6 @@ module.exports = function (chronology, autolink) {
   this.meta.type = 'linkage';
   this.meta.weighted = false;
 
-  if (chronology.length <= 1) {
-    throw "[Neuras] A linkage should have at least two Layer classes!";
-  };
-
   this.chronology = chronology;
   this.configuration = new Array();
 
@@ -40,7 +36,7 @@ module.exports = function (chronology, autolink) {
   };
 
   this.forward = function (m) {
-    
+
     if (m === undefined) {
       this.chronology[0].forward();
     } else {
@@ -52,6 +48,37 @@ module.exports = function (chronology, autolink) {
       var latest = this.chronology[i].forward();
     };
     return latest;
+  };
+
+  this.merge = function (linkage, connect) {
+    if (!(linkage instanceof module.exports)) {
+      throw "[Neuras] Can only merge to Linkage classes!";
+    };
+
+    if (connect) {
+      this.connect(linkage);
+    };
+
+    this.chronology = this.chronology.concat(linkage.chronology);
+    return this;
+  };
+
+  this.lock = function () {
+    for (var i = 0; i < this.chronology.length; i++) {
+      this.chronology[i].lock();
+    };
+    return this;
+  };
+
+  this.unlock = function () {
+    for (var i = 0; i < this.chronology.length; i++) {
+      this.chronology[i].unlock();
+    };
+    return this;
+  };
+
+  this.toLayer = function () {
+    return new Layer().addLinkage(this);
   };
 
   this.backpropagate = function (chain_m) {
@@ -89,7 +116,7 @@ module.exports = function (chronology, autolink) {
     for (var i = 0; i < output.neurones.length; i++) {
       if (Math.random() < probability) {
         if (unit.meta.type == 'linkage') {
-          output.connectSequentially(unit.chronology[0]);
+          output.connect(unit.chronology[0]);
         } else {
           output.neurones[i].connect(unit);
         };
@@ -101,6 +128,11 @@ module.exports = function (chronology, autolink) {
   this.disconnectDuplicates = function () {
     this.chronology[0].disconnectDuplicates();
     return this;
+  };
+
+  this.getUnsquashedOutput = function () {
+    var last_layer = this.chronology[this.chronology.length - 1];
+    return last_layer.getUnsquashedOutput();
   };
 
   this.setDerivativeChain = function (type, layer, chain_m) {
