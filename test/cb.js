@@ -4,7 +4,9 @@ var ae = new neuras.Architecture.Autoencoder([3, 2], 1, [5, 3]);
 
 var mentor = new neuras.Mentor(ae);
 
-var set = [.2, .4, .3];
+var set = [.2, .4, .9];
+
+// Str.charCodeAt(0);
 
 mentor.setOptimiser('compound-momentum');
 
@@ -18,8 +20,8 @@ for (var i = 0; i < 1000; i++) {
 var vv = ae.forward(set);
 console.log(vv);
 
-/*
+
 var encoded = ae.getEncoded();
 console.log(encoded);
-var out = ae.decoder.forward(encoded);
-console.log(out);*/
+var out = ae.decoder.forward([30]);
+console.log(out);

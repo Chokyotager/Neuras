@@ -51,6 +51,19 @@ module.exports = function (linkage, json) {
     return this;
   };
 
+  this.trainStochastically = function (inputs, outputs, rate) {
+    //console.log(outputs)
+    var deriv = 0;
+    var evl = 0;
+    for (var i = 0; i < inputs.length; i++) {
+      var out = this.linkage.forward(inputs[i])[0];
+      deriv += this.derivative(outputs[i][0], out);
+      evl += this.evaluate(outputs[i][0], out);
+    };
+    this.linkage.backpropagate([deriv * rate / inputs.length]);
+    return evl/inputs.length;
+  };
+
   this.train = function (input, expected, rate) {
     var losses = new Array();
     var derivatives = new Array();

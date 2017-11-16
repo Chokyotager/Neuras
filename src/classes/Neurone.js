@@ -234,16 +234,6 @@ module.exports = function () {
     return this;
   };
 
-  // not in use
-  this.monopropagate = function (chain, rate, backconnection) {
-    // backpropagates through chosen connection relative to neurone
-    var index = find_backconnection(backconnection, this.backconnections);
-    if (this.backconnection[index].dropout == false && this.backconnections[i].weight !== undefined) {
-      this.backconnection[index].weight -= rate * this.derivative * this.cache.matrix[i] * chain;
-    };
-    return this;
-  };
-
   function find_backconnection (backconnection, backconnections) {
     for (var i = 0; i < backconnections.length; i++) {
       if (backconnection == backconnections[i]) {
