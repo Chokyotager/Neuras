@@ -16,7 +16,7 @@ module.exports = function (encoder, auto, decoder) {
   for (var i = 0; i < decoder.length - 1; i++) {
     d.push(new Layer().addNeurones(decoder[i], 'tanh'));
   };
-  d.push(new Layer().addNeurones(decoder[decoder.length - 1], 'tanh'))
+  d.push(new Layer().addNeurones(decoder[decoder.length - 1], 'identity'))
   d = new Linkage(d, true);
 
   var main = new Linkage([e.toLayer(), auto, d.toLayer()], true);

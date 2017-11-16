@@ -31,7 +31,7 @@ module.exports = function (type) {
     break;
 
     case "leaky-relu":
-    this.evaluate = function (x) {return (x < 0) ? x*0.01 : x};
+    this.evaluate = function (x) {return Math.max(0, x)};
     this.derivative = function (x) {return (x < 0) ? 0.01 : 1};
     break;
 
