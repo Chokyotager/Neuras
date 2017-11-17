@@ -113,7 +113,7 @@ module.exports = function () {
           unit.backconnections.push({neurone: this});
       } else {
         if (typeof weight !== 'number') {
-          weight = Math.random();
+          weight = Math.random()-.5;
         };
         unit.backconnections.push({neurone: this, weight: weight, dropout: false, frozen: false});
       };
