@@ -18,7 +18,7 @@ module.exports = function (optimiser, properties) {
       this.optimisation = function (m) {
         var n = new Array();
         for (var i = 0; i < m.length; i++) {
-          n.push(this.options.amount * this.cache.prev[i] - m[i]);
+          n.push(m[i] * Math.random());
         };
         this.cache.prev = n;
         return n;

@@ -194,7 +194,7 @@ module.exports = function () {
         };
 
         //update previous derivatives
-        this.backconnections[i].neurone.chain_derivative += derivative * this.backconnections[i].weight;
+        this.backconnections[i].neurone.chain_derivative += derivative * this.backconnections[i].weight * this.backconnections[i].local_trainrate; //this.squash.derivative(this.cache.miu) * this.chain_derivative * this.backconnections[i].weight;
       } else {
         this.backconnections[i].neurone.chain_derivative += 0;
       };

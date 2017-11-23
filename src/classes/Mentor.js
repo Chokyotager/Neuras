@@ -59,22 +59,35 @@ module.exports = function (linkage, json) {
 
     typeof probability !== 'number' ? probability = 1 : null;
 
-    var deriv = 0;
-    var loss = 0;
     var count = 0;
+    var derivatives = new Array(inputs[0].length).fill(0);
+    var losses = new Array(inputs[0].length).fill(0);
+
     for (var i = 0; i < inputs.length; i++) {
-      if (Math.random() > probability && (count !== 0 && i !== (inputs.length - 1))) {
+      if (Math.random() > probability) {
         continue;
       };
       count++
-      var out = this.linkage.forward(inputs[i])[0];
-      deriv += this.derivative(outputs[i][0], out);
-      loss += this.evaluate(outputs[i][0], out);
+      var out = this.linkage.forward(inputs[i]);
+
+      for (var j = 0; j < inputs[i].length; j++) {
+        derivatives[j] += this.derivative(outputs[i][j], out[j]);
+        losses[j] += this.evaluate(outputs[i][j], out[j]);
+      };
     };
 
-    deriv = this.optimiser.optimise([(deriv * rate)/count])
-    this.linkage.backpropagate([deriv]);
-    return loss/count;
+    if (count > 0) {
+
+      for (var i = 0; i < derivatives.length; i++) {
+        derivatives[i] = derivatives[i] / count;
+        losses[i] /= count;
+      };
+
+      deriv = this.optimiser.optimise(derivatives);
+      this.linkage.backpropagate(deriv);
+    };
+
+    return losses;
 
   };
 
