@@ -34,6 +34,18 @@ module.exports = function () {
 
   //Object.freeze(this.meta);
 
+  this.messUpWeights = function (probability, delta) {
+    (typeof probability !== 'number') ? probability = 1 : null;
+    (typeof delta !== 'number') ? delta = 0.05 : null;
+
+    for (var i = 0; i < this.backconnections.length; i++) {
+      if (this.backconnections[i].frozen === false) {
+        this.backconnections[i].weight -= this.backconnections[i].weight * (Math.random() - 0.5) * 2 * delta;
+      };
+    };
+
+  };
+
   this.limitConnections = function (connections) {
     if (connections < this.backconnections.length) {
       throw "[Neuras] Cannot lower backconnection limits than already existing number of connections!";
@@ -60,10 +72,10 @@ module.exports = function () {
   this.addBias = function (weighted, bias) {
     var push = {neurone: {type: 'bias', uuid: uuid()}, dropout: false};
     if (weighted == true) {
-      push.weight = Math.random();
+      push.weight = 2 * (Math.random()-.5);
     };
     if (typeof bias != 'number') {
-      bias = Math.random();
+      bias = 2 * (Math.random()-.5);
     };
     this.biases++
     push.neurone.value = bias;
@@ -94,6 +106,15 @@ module.exports = function () {
     return output;
   };
 
+  this.jumbleTrainRate = function (probability) {
+    (typeof probability !== 'number') ? probability = 1 : null;
+    for (var i = 0; i < this.backconnections.length; i++) {
+      if (Math.random() <= probability && this.backconnections[i].frozen === false) {
+        this.backconnections[i].local_trainrate = Math.random();
+      };
+    };
+  };
+
   this.connect = function (unit, weight) {
     var unweightedInstance = unit.meta.weighted == false;
     var weightedInstance = unit.meta.weighted == true;
@@ -113,9 +134,9 @@ module.exports = function () {
           unit.backconnections.push({neurone: this});
       } else {
         if (typeof weight !== 'number') {
-          weight = Math.random()-.5;
+          weight = 2 * (Math.random()-.5);
         };
-        unit.backconnections.push({neurone: this, weight: weight, dropout: false, frozen: false});
+        unit.backconnections.push({neurone: this, weight: weight, dropout: false, frozen: false, local_trainrate: Math.random()});
       };
     return this;
   };
@@ -169,7 +190,7 @@ module.exports = function () {
       if (this.backconnections[i].dropout == false && this.backconnections[i].weight !== undefined) {
 
         if (this.backconnections[i].frozen == false) {
-          this.backconnections[i].weight -= derivative * this.backconnections[i].neurone.value;
+          this.backconnections[i].weight -= derivative * this.backconnections[i].neurone.value * this.backconnections[i].local_trainrate;
         };
 
         //update previous derivatives

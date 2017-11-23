@@ -50,6 +50,10 @@ module.exports = function (chronology, autolink) {
     return latest;
   };
 
+  this.passivelyForward = function (m) {
+    return this.clone().forward(m);
+  };
+
   this.merge = function (linkage, connect) {
     if (!(linkage instanceof module.exports)) {
       throw "[Neuras] Can only merge to Linkage classes!";
@@ -60,7 +64,29 @@ module.exports = function (chronology, autolink) {
     };
 
     this.chronology = this.chronology.concat(linkage.chronology);
+    this.configuration = this.configuration.concat(linkage.configuration);
     return this;
+  };
+
+  this.clone = function () {
+    return Object.assign( Object.create( Object.getPrototypeOf(this)), this);
+  };
+
+  this.jumbleTrainRate = function (probability) {
+    (typeof probability !== 'number') ? probability = 1 : null;
+
+    for (var i = 0; i < chronology.length; i++) {
+      chronology[i].jumbleTrainRate(probability);
+    };
+  };
+
+  this.messUpWeights = function (probability, delta) {
+    (typeof probability !== 'number') ? probability = 1 : null;
+    (typeof delta !== 'number') ? delta = 0.05 : null;
+
+    for (var i = 0; i < chronology.length; i++) {
+      chronology[i].messUpWeights(probability, delta);
+    };
   };
 
   this.lock = function () {
@@ -133,6 +159,30 @@ module.exports = function (chronology, autolink) {
   this.getUnsquashedOutput = function () {
     var last_layer = this.chronology[this.chronology.length - 1];
     return last_layer.getUnsquashedOutput();
+  };
+
+  this.dropoutNeurones = function (probability) {
+
+    if (typeof probability !== 'number') {
+      throw "[Neuras] Probability for dropouts cannot be undefined!";
+    };
+
+    for (var i = 0; i < this.chronology.length; i++) {
+      this.chronology[i].dropoutNeurones(probability);
+    };
+
+  };
+
+  this.dropoutWeights = function (probability) {
+
+    if (typeof probability !== 'number') {
+      throw "[Neuras] Probability for dropouts cannot be undefined!";
+    };
+
+    for (var i = 0; i < this.chronology.length; i++) {
+      this.chronology[i].dropoutWeights(probability);
+    };
+
   };
 
   this.setDerivativeChain = function (type, layer, chain_m) {

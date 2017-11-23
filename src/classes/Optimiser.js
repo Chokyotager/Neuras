@@ -1,21 +1,27 @@
-module.exports = function (optimiser) {
-  switch (optimiser) {
-    case "principle-momentum":
-      this.type = 'principle-momentum';
+module.exports = function (optimiser, properties) {
+  this.options = properties;
+  switch (optimiser.toLowerCase()) {
+    case "average":
+      this.type = 'average';
       this.optimisation = function (m) {
-        return this.cache.compound;
+        var n = new Array();
+        for (var i = 0; i < m.length; i++) {
+          n.push((m[i] + this.cache.prev[i]) / 2)
+        };
+        this.cache.prev = n;
+        return n;
       };
       break;
 
-    case "compound-momentum":
+    case "momentum":
+      this.type = 'momentum';
       this.optimisation = function (m) {
-        return this.cache.compound_optimised;
-      };
-      break;
-
-    case "compound-momentum-squared":
-      this.optimisation = function (m) {
-        this.cache.compound_optimised.forEach(function (x) {return Math.pow(x, 2);});
+        var n = new Array();
+        for (var i = 0; i < m.length; i++) {
+          n.push(this.options.amount * this.cache.prev[i] - m[i]);
+        };
+        this.cache.prev = n;
+        return n;
       };
       break;
 
@@ -62,35 +68,14 @@ module.exports = function (optimiser) {
 
   this.optimise = function (m) {
 
-    if (this.cache.compound === undefined) {
-      this.cache.compound = m;
-    };
-
-    if (this.cache.compound_optimised === undefined) {
-      this.cache.compound_optimised = m;
+    if (this.cache.prev === undefined) {
+      this.cache.prev = m;
     };
 
     var x = this.optimisation(m);
-    this.compoundLog(m, x);
-
-    this.cache.previous = m;
-    this.cache.optimised = x;
+    typeof this.log === 'function' ? this.log(x, m) : null;
 
     return x;
-  };
-
-  this.compoundLog = function (m, x) {
-    if (this.cache.compound.length !== m.length) {
-      this.cache.compound = m;
-    } else {
-      this.cache.compound = dotAverage(this.cache.compound, m)
-    };
-
-    if (this.cache.compound_optimised.length !== x.length) {
-      this.cache.compound_optimised = x;
-    } else {
-      this.cache.compound_optimised = dotAverage(this.cache.compound_optimised, x)
-    };
   };
 
 };

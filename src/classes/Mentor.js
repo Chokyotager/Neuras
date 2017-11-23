@@ -46,22 +46,36 @@ module.exports = function (linkage, json) {
 
   this.optimiser = new Optimiser('none');
 
-  this.setOptimiser = function (optimiser) {
-    this.optimiser = new Optimiser(optimiser);
+  this.setOptimiser = function (optimiser, properties) {
+    this.optimiser = new Optimiser(optimiser, properties);
     return this;
   };
 
-  this.trainStochastically = function (inputs, outputs, rate) {
-    //console.log(outputs)
+  this.trainStochastically = function (inputs, outputs, rate, probability) {
+
+    if (inputs.length !== outputs.length) {
+      throw "[Neuras] Input array should be of the same length as output array!";
+    };
+
+    typeof probability !== 'number' ? probability = 1 : null;
+
     var deriv = 0;
-    var evl = 0;
+    var loss = 0;
+    var count = 0;
     for (var i = 0; i < inputs.length; i++) {
+      if (Math.random() > probability && (count !== 0 && i !== (inputs.length - 1))) {
+        continue;
+      };
+      count++
       var out = this.linkage.forward(inputs[i])[0];
       deriv += this.derivative(outputs[i][0], out);
-      evl += this.evaluate(outputs[i][0], out);
+      loss += this.evaluate(outputs[i][0], out);
     };
-    this.linkage.backpropagate([deriv * rate / inputs.length]);
-    return evl/inputs.length;
+
+    deriv = this.optimiser.optimise([(deriv * rate)/count])
+    this.linkage.backpropagate([deriv]);
+    return loss/count;
+
   };
 
   this.train = function (input, expected, rate) {
@@ -72,7 +86,7 @@ module.exports = function (linkage, json) {
 
     for (var i = 0; i < expected.length; i++) {
       losses.push(this.evaluate(expected[i], output[i]));
-      derivatives.push(this.derivative(expected[i], output[i])) * rate;
+      derivatives.push(this.derivative(expected[i], output[i]) * rate);
     };
 
     var updated_derivatives = this.optimiser.optimise(derivatives);

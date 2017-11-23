@@ -1,19 +1,19 @@
 var neuras = require('../src/neura');
 var Jimp = require('jimp');
 
-var ff = new neuras.Architecture.GRU([1, 2, 2, 1]);
+var ff = new neuras.Architecture.LSTM([1, 2, 2, 1]);
 var mentor = new neuras.Mentor(ff);
 
 var divisor = 10000;
 
 var b = function (x) {
-  return Math.sin(x) * Math.cos(x) * 300;
+  return Math.pow(x, 3);
 };
 
 var input = new Array();
 var output = new Array();
-for (var i = 0; i < 30; i++) {
-  var x = (Math.random() - 0.5) * 2 * 6;
+for (var i = 0; i < 20; i++) {
+  var x = (Math.random() - 0.5) * 2 * 12;
   input.push([x]);
   output.push([b(x) / divisor]);
 };
@@ -22,8 +22,8 @@ for (var i = 0; i < 30; i++) {
 
 for (var i = 0; i < 10000; i++) {
   for (var j = 0; j < input.length; j++) {
-    var ll = mentor.train(input[j], output[j], 0.04);
-  }
+    var ll = mentor.train(input[j], output[j], 0.4);
+  };
   i % 100 === 0 ? console.log("Iteration: %s, Loss: %s", i, ll) : null;
 };
 

@@ -2,10 +2,10 @@ var neuras = require('../src/neura');
 var Jimp = require('jimp');
 
 var one = new neuras.Layer().addNeurones(1, 'identity');
-var onepointfive = new neuras.Layer().addNeurones(2, 'logistic').addBiases(1, false);
-var onepoint7 = new neuras.Layer().addNeurones(2, 'softplus').addBiases(1, true);
-var onepoint8 = new neuras.Layer().addNeurones(2, 'gaussian').addBiases(1);
-var two = new neuras.Layer().addNeurones(1, 'tanh');
+var onepointfive = new neuras.Layer().addNeurones(3, 'logistic').addBiases(1, false);
+var onepoint7 = new neuras.Layer().addNeurones(2, 'tanh').addBiases(1, true);
+var onepoint8 = new neuras.Layer().addNeurones(3, 'logistic').addBiases(1);
+var two = new neuras.Layer().addNeurones(1, 'softplus');
 
 var ff = new neuras.Linkage([one, onepointfive, onepoint7, onepoint8, two], true);
 var mentor = new neuras.Mentor(ff);
@@ -13,30 +13,31 @@ var mentor = new neuras.Mentor(ff);
 var divisor = 10000;
 
 var b = function (x) {
-  return Math.pow(x, 2) - 300;
+  return Math.pow(x, 2);
 };
 
 var input = new Array();
 var output = new Array();
-for (var i = 0; i < 30; i++) {
+for (var i = 0; i < 40; i++) {
   var x = (Math.random() - 0.5) * 2 * 24;
   input.push([x]);
   output.push([b(x) / divisor]);
 };
 
-//mentor.setOptimiser('compound-momentum');
+mentor.setOptimiser('principle-momentum');
 
-for (var i = 0; i < 1000000; i++) {
-  for (var j = 0; j < input.length; j++) {
-    var ll = mentor.train(input[j], output[j], 0.04);
-  }
+for (var i = 0; i < 100000; i++) {
+  /*for (var j = 0; j < input.length; j++) {
+    var ll = mentor.train(input[j], output[j], .4);
+  };*/
+  var ll = mentor.trainStochastically(input, output, 4, 0.5);
   i % 100 === 0 ? console.log("Iteration: %s, Loss: %s", i, ll) : null;
 };
 
 console.log(ff.forward([-2]));
 console.log(ff.forward([2]));
 
-plot('haha');
+plot('stochastic');
 
 function evaluate (x) {
   return ff.forward([x])[0] * divisor;

@@ -25,7 +25,7 @@ module.exports = function (encoder, auto, decoder) {
   main.decoder = new Linkage([auto, d.toLayer()]);
   main.autoLayer = auto;
 
-  main.getEncoded = function () {
+  main.prototype.getEncoded = function () {
     return main.chronology[1].getUnsquashedOutput();
   };
 

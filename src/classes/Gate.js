@@ -298,12 +298,12 @@ module.exports = function (gate, options) {
       };
     } else if (unweightedInstance) {
           unit.backconnections.push({neurone: this});
-        } else {
-          if (typeof weight !== 'number') {
-            weight = Math.random();
-          };
-          unit.backconnections.push({neurone: this, weight: weight, dropout: false, frozen: false});
+      } else {
+        if (typeof weight !== 'number') {
+          weight = 2 * (Math.random()-.5);
         };
+        unit.backconnections.push({neurone: this, weight: weight, dropout: false, frozen: false, local_trainrate: Math.random()});
+      };
     return this;
   };
 

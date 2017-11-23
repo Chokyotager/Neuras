@@ -44,6 +44,6 @@ module.exports = function () {
 
   //console.log(new Layer().addUnits([central_additive, central_squash]));
 
-  return new Linkage([one, one_point_five, two, three, four]);
+  return new Linkage([one, one_point_five, two, three, four, five]);
 
 };

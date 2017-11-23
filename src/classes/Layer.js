@@ -3,7 +3,7 @@ var Gate = require('./Gate');
 var Buffer = require('./Buffer');
 
 module.exports = function () {
-  this.neurones = new Array()
+  this.neurones = new Array();
 
   this.addNeurones = function (neurones, squash) {
     (squash === undefined) ? squash = 'tanh' : null;
@@ -23,6 +23,11 @@ module.exports = function () {
     for (var i = 0; i < this.neurones.length; i++) {
       this.neurones[i].unlock();
     };
+  };
+
+  this.selfconnect = function () {
+    this.connect(this);
+    return this;
   };
 
   this.addGate = function (gate) {
@@ -51,6 +56,10 @@ module.exports = function () {
 
   this.addBiases = function (probability, weighted, bias) {
 
+    if (weighted === undefined) {
+      weighted = false;
+    };
+
     for (var i = 0; i < this.neurones.length; i++) {
       if (Math.random() <= probability && this.neurones[i] instanceof Neurone) {
         this.neurones[i].addBias(weighted, bias);
@@ -76,35 +85,60 @@ module.exports = function () {
   };
 
   this.dropoutNeurones = function (probability) {
-    var neurones = new Array();
+
+    if (typeof probability !== 'number') {
+      throw "[Neuras] Probability for dropouts cannot be undefined!";
+    };
+
     for (var i = 0; i < this.neurones.length; i++) {
-      if (Math.random() <= probability && this.neurones[i] instanceof Neurone) {
+      if (Math.random() <= probability && (this.neurones[i].meta.type === 'neurone' || this.neurones[i].meta.type === 'linkage')) {
         this.neurones[i].dropout(1);
-        neurones.push(this.neurones[i]);
       };
     };
-    return neurones;
+  };
+
+  this.jumbleTrainRate = function (probability) {
+
+    (typeof probability !== 'number') ? probability = 1 : null;
+
+    for (var i = 0; i < this.neurones.length; i++) {
+      if (Math.random() <= probability && (this.neurones[i].meta.type === 'neurone' || this.neurones[i].meta.type === 'linkage')) {
+        this.neurones[i].jumbleTrainRate(probability);
+      };
+    };
+  };
+
+  this.messUpWeights = function (probability, delta) {
+
+    (typeof probability !== 'number') ? probability = 1 : null;
+    (typeof delta !== 'number') ? delta = 0.05 : null;
+
+    for (var i = 0; i < this.neurones.length; i++) {
+      if (Math.random() <= probability && (this.neurones[i].meta.type === 'neurone' || this.neurones[i].meta.type === 'linkage')) {
+        this.neurones[i].messUpWeights(probability, delta);
+      };
+    };
   };
 
   this.dropoutWeights = function (probability) {
-    var weights = new Array();
+    if (typeof probability !== 'number') {
+      throw "[Neuras] Probability for dropouts cannot be undefined!";
+    };
+
     for (var i = 0; i < this.neurones.length; i++) {
-      if (this.neurones[i] instanceof Neurone) {
-        weights.push(this.neurones[i].dropout(probability));
+      if (Math.random() <= probability && (this.neurones[i].meta.type === 'neurone' || this.neurones[i].meta.type === 'linkage')) {
+        this.neurones[i].dropout(probability);
       };
     };
-    return weights;
   };
 
   this.freezeNeurones = function (probability) {
 
     (typeof probability !== 'number') ? probability = 1 : null;
 
-    var neurones = new Array();
     for (var i = 0; i < this.neurones.length; i++) {
       if (Math.random() <= probability && this.neurones[i] instanceof Neurone) {
         this.neurones[i].freeze();
-        neurones.push(this.neurones[i]);
       };
     };
     return neurones;
@@ -114,14 +148,12 @@ module.exports = function () {
 
     (typeof probability !== 'number') ? probability = 1 : null;
 
-    var weights = new Array();
     for (var i = 0; i < this.neurones.length; i++) {
       if (this.neurones[i] instanceof Neurone) {
-        weights.push(this.neurones[i].freeze(probability));
+        this.neurones[i].freeze(probability);
       };
     };
-    return weights;
-  }
+  };
 
   this.unfreezeNeurones = function  (probability) {
 

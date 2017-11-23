@@ -2,9 +2,9 @@ var neuras = require('../src/neura');
 var Jimp = require('jimp');
 
 var one = new neuras.Layer().addNeurones(1, 'identity');
-var onepointfive = new neuras.Layer().addNeurones(2, 'logistic').addBiases(1, false);
-var onepoint7 = new neuras.Layer().addNeurones(2, 'softplus').addBiases(1, true);
-var onepoint8 = new neuras.Layer().addNeurones(2, 'gaussian').addBiases(1);
+var onepointfive = new neuras.Layer().addNeurones(4, 'logistic')//.addBiases(1, false);
+var onepoint7 = new neuras.Layer().addNeurones(5, 'logistic').addBiases(1, true);
+var onepoint8 = new neuras.Layer().addNeurones(4, 'tanh')//.addBiases(1);
 var two = new neuras.Layer().addNeurones(1, 'tanh');
 
 var ff = new neuras.Linkage([one, onepointfive, onepoint7, onepoint8, two], true);
@@ -13,30 +13,52 @@ var mentor = new neuras.Mentor(ff);
 var divisor = 10000;
 
 var b = function (x) {
-  return Math.pow(x, 2) - 300;
+  return Math.sin(x) * 300;
 };
 
 var input = new Array();
 var output = new Array();
-for (var i = 0; i < 30; i++) {
+for (var i = 0; i < 40; i++) {
   var x = (Math.random() - 0.5) * 2 * 24;
   input.push([x]);
   output.push([b(x) / divisor]);
 };
 
-//mentor.setOptimiser('compound-momentum');
+mentor.setOptimiser('compound-momentum');
 
-for (var i = 0; i < 1000000; i++) {
+for (var i = 0; i < 300000; i++) {
+
+  var ll = 0;
+
   for (var j = 0; j < input.length; j++) {
-    var ll = mentor.train(input[j], output[j], 0.04);
-  }
-  i % 100 === 0 ? console.log("Iteration: %s, Loss: %s", i, ll) : null;
+    ll += mentor.train(input[j], output[j], .04)[0];
+  };
+
+  //var ll = mentor.trainStochastically(input, output, 4, 0.5);
+
+  if (i % 100 === 0) {
+
+    /*if (ll < 10e-10) {
+      console.log("Force quit!");
+      break;
+    };*/
+
+    console.log("Iteration: %s, Loss: %s", i, ll);
+    if ((Math.abs(cache - ll) / ll) < 0.000005 && ll > 10e-6 && i > 0) {
+      console.log("DROPOUT!");
+      ff.dropoutWeights(0.02);
+      ff.jumbleTrainRate(0.06);
+      ff.messUpWeights(0.05, 0.05);
+    };
+    var cache = ll;
+  };
+
 };
 
 console.log(ff.forward([-2]));
 console.log(ff.forward([2]));
 
-plot('haha');
+plot('do');
 
 function evaluate (x) {
   return ff.forward([x])[0] * divisor;
@@ -45,7 +67,7 @@ function evaluate (x) {
 function plot(nameext) {
 
   var config = {
-    scale: 0.2,
+    scale: .1,
     range: 0
   };
 
