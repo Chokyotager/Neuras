@@ -91,8 +91,12 @@ module.exports = function () {
     };
 
     for (var i = 0; i < this.neurones.length; i++) {
-      if (Math.random() <= probability && (this.neurones[i].meta.type === 'neurone' || this.neurones[i].meta.type === 'linkage')) {
-        this.neurones[i].dropout(1);
+      if (Math.random() <= probability) {
+        if (this.neurones[i].meta.type === 'neurone') {
+          this.neurones[i].dropout(1);
+        } else if (this.neurones[i].meta.type === 'linkage') {
+          this.neurones[i].dropoutNeurones(probability);
+        };
       };
     };
   };
@@ -126,8 +130,12 @@ module.exports = function () {
     };
 
     for (var i = 0; i < this.neurones.length; i++) {
-      if (Math.random() <= probability && (this.neurones[i].meta.type === 'neurone' || this.neurones[i].meta.type === 'linkage')) {
-        this.neurones[i].dropout(probability);
+      if (Math.random() <= probability) {
+        if (this.neurones[i].meta.type === 'neurone') {
+          this.neurones[i].dropout(probability);
+        } else if (this.neurones[i].meta.type === 'linkage') {
+          this.neurones[i].dropoutWeights(probability);
+        };
       };
     };
   };
