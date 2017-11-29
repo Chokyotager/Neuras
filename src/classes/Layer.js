@@ -149,7 +149,7 @@ module.exports = function () {
         this.neurones[i].freeze();
       };
     };
-    return neurones;
+    return this;
   }
 
   this.freezeWeights = function (probability) {
@@ -161,6 +161,7 @@ module.exports = function () {
         this.neurones[i].freeze(probability);
       };
     };
+    return this;
   };
 
   this.unfreezeNeurones = function  (probability) {

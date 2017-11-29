@@ -199,6 +199,7 @@ module.exports = function () {
         this.backconnections[i].neurone.chain_derivative += 0;
       };
     };
+    this.chain_derivative = 0;
     return this;
   };
 
