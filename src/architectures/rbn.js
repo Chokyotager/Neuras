@@ -3,7 +3,7 @@
 var Layer = require('../classes/Layer');
 var Linkage = require('../classes/Linkage');
 
-module.exports = function (layers) {
+module.exports = function (layers, biasProbability) {
 
   if (layers.length < 2) {
     throw "[Neuras] Radial Basis Networks should have at least two layers!";
@@ -12,7 +12,7 @@ module.exports = function (layers) {
   var layering = new Array();
 
   for (var i = 0; i < layers.length - 1; i++) {
-    layering.push(new Layer().addNeurones(layers[i], 'sinc'));
+    layering.push(new Layer().addNeurones(layers[i], 'tanh').addBiases(biasProbability));
   };
 
   layering.push(new Layer().addGates(layers[layers.length - 1], 'additive'));
