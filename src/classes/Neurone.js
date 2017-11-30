@@ -22,8 +22,8 @@ module.exports = function () {
     zeta: function (b) {
       var m = new Array();
       for (var i = 0; i < b.length; i++) {
-        if (b[i].dropout == false) {
-          b[i].weight !== undefined ? m.push(b[i].neurone.value * b[i].weight) : m.push(0);
+        if (b[i].dropout === false) {
+          b[i].weight !== undefined ? m.push(b[i].neurone.value * b[i].weight) : m.push(b[i].neurone.value);
         } else {
           m[i] = 0;
         };
