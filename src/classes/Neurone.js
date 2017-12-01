@@ -136,7 +136,7 @@ module.exports = function () {
         if (typeof weight !== 'number') {
           weight = 2 * (Math.random()-.5);
         };
-        unit.backconnections.push({neurone: this, weight: weight, dropout: false, frozen: false, local_trainrate: Math.random()});
+        unit.backconnections.push({neurone: this, weight: weight, dropout: false, frozen: false, local_trainrate: 1});
       };
     return this;
   };
