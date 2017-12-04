@@ -12,7 +12,7 @@ module.exports = function (layers, biasProbability) {
   var layering = new Array();
 
   for (var i = 0; i < layers.length - 1; i++) {
-    layering.push(new Layer().addNeurones(layers[i], 'tanh').freezeNeurones().addBiases(biasProbability, false));
+    layering.push(new Layer().addNeurones(layers[i], 'gaussian').freezeNeurones().addBiases(biasProbability, false));
   };
 
   layering.push(new Layer().addNeurones(layers[i], 'identity'));
