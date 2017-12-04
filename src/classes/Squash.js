@@ -3,7 +3,31 @@ module.exports = function (type) {
     return Math.log(exponent) / Math.log(base);
   };
 
-  switch (type.toLowerCase()) {
+  type = type.toLowerCase();
+
+  if (type.substring(0, 6) === 'random') {
+    var enumerate = type.substring(7, type.length);
+    var possible_types = new Array();
+    switch (enumerate) {
+      case "primitive":
+      possible_types = ['tanh', 'arctan', 'logistic'];
+      break;
+
+      case "extended":
+      possible_types = ['tanh', 'arctan', 'logistic', 'sinc', 'sin', 'logistic', 'gaussian'];
+      break;
+
+      case "regression":
+      possible_types = ['leaky-relu', 'softplus', 'identity', 'cube', 'natural-exponential'];
+
+      default:
+      possible_types = ['tanh', 'arctan', 'logistic'];
+      break;
+    };
+    type = possible_types[Math.round(Math.random() * (possible_types.length-1))];
+  };
+
+  switch (type) {
 
     case "tanh":
     this.evaluate = function (x) {return Math.tanh(x)};
@@ -60,6 +84,11 @@ module.exports = function (type) {
     this.derivative = function (x) {return (x === 0) ? 10e30 : 0};
     break;
 
+    case "signum":
+    this.evaluate = function (x) {return (x < 0) ? 0 : -1};
+    this.derivative = function (x) {return (x === 0) ? 10e30 : 0};
+    break;
+
     case "relu":
     this.evaluate = function (x) {if (x >= 0) {return x} else {return 0}};
     this.derivative = function (x) {if (x >= 0) {return 1} else {return 0}};
@@ -75,6 +104,11 @@ module.exports = function (type) {
     this.derivative = function (x) {return 1/x * Math.logab(Math.E, 10)};
     break;
 
+    case "ablog":
+    this.evaluate = function (x) {return Math.log(Math.abs(x)+10e-30)};
+    this.derivative = function (x) {return (x*Math.logab(Math.E, 10))/((Math.abs(x)+10e-30)*Math.abs(x))};
+    break;
+
     case "identity":
     this.evaluate = function (x) {return x};
     this.derivative = function (x) {return 1};
@@ -84,6 +118,10 @@ module.exports = function (type) {
     this.evaluate = function (x) {return 4 * x};
     this.derivative = function (x) {return 4};
     break;
+
+    case "bent-identity":
+    this.evaluate = function (x) {(Math.sqrt(Math.pow(x, 2) + 1)-1)/2 + x};
+    this.derivative = function (x) {x/(2*Math.sqrt(Math.pow(x, 2) + 1)) + 1};
 
     case "gaussian":
     this.evaluate = function (x) {return Math.pow(Math.E, Math.pow(-x, 2))};
