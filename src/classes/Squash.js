@@ -17,6 +17,9 @@ module.exports = function (type) {
       possible_types = ['tanh', 'arctan', 'logistic', 'sinc', 'sin', 'logistic', 'gaussian'];
       break;
 
+      case "extended++":
+      possible_types = ['tanh', 'arctan', 'logistic', 'sinc', 'sin', 'logistic', 'gaussian', 'binary-step', 'signum', 'softplus', 'bent-identity'];
+
       case "regression":
       possible_types = ['leaky-relu', 'softplus', 'identity', 'cube', 'natural-exponential'];
 
@@ -90,8 +93,8 @@ module.exports = function (type) {
     break;
 
     case "relu":
-    this.evaluate = function (x) {if (x >= 0) {return x} else {return 0}};
-    this.derivative = function (x) {if (x >= 0) {return 1} else {return 0}};
+    this.evaluate = function (x) {return Math.max(x, 0)};
+    this.derivative = function (x) {return (x < 0) ? 0 : 1};
     break;
 
     case "natural-exponential":
@@ -135,6 +138,10 @@ module.exports = function (type) {
     case "softplus":
     this.evaluate = function (x) {return Math.logab(1 + Math.pow(Math.E, x), Math.E)};
     this.derivative = function (x) {return 1/(1 + Math.pow(Math.E, x))};
+
+    case "smooth-cube":
+    this.evaluate = function (x) {return Math.pow(x, 2)/Math.sin(x)};
+    this.derivative = function (x) {return (x*(2*Math.sin(x)+Math.cos(x)))/Math.pow(Math.sin(x), 2)};
 
     default:
     this.evaluate = function (x) {return x};

@@ -43,6 +43,7 @@ module.exports = function (linkage, json) {
   this.cache = new Object();
   this.cache.compound = new Array();
   this.cache.adjacent = new Array();
+  this.gradient_clip = Infinity;
 
   this.optimiser = new Optimiser('none');
 
@@ -91,6 +92,21 @@ module.exports = function (linkage, json) {
 
   };
 
+  this.setClip = function (clip) {
+
+    if (clip === undefined) {
+      clip = Infinity;
+    };
+
+    clip = parseFloat(clip);
+    if (isNaN(clip)) {
+      throw "[Neuras] Clip should be a defined floating point!";
+    } else if (clip < 0) {
+      throw "[Neuras] Clip cannot be negative!";
+    };
+    this.gradient_clip = clip;
+  };
+
   this.train = function (input, expected, rate) {
     var losses = new Array();
     var derivatives = new Array();
@@ -103,6 +119,11 @@ module.exports = function (linkage, json) {
     };
 
     var updated_derivatives = this.optimiser.optimise(derivatives);
+
+    // Capping
+    for (var i = 0; i < updated_derivatives.length; i++) {
+      updated_derivatives[i] = Math.max(Math.min(updated_derivatives[i], this.gradient_clip), -this.gradient_clip);
+    };
 
     this.linkage.backpropagate(updated_derivatives);
 
