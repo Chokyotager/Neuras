@@ -18,10 +18,10 @@ module.exports = function (type) {
       break;
 
       case "extended++":
-      possible_types = ['tanh', 'arctan', 'logistic', 'sinc', 'sin', 'logistic', 'gaussian', 'binary-step', 'signum', 'softplus', 'bent-identity'];
+      possible_types = ['tanh', 'arctan', 'logistic', 'sinc', 'sin', 'logistic', 'gaussian', 'binary-step', 'signum', 'softplus'];
 
       case "regression":
-      possible_types = ['leaky-relu', 'softplus', 'identity', 'cube', 'natural-exponential'];
+      possible_types = ['leaky-relu', 'softplus', 'identity', 'cube', 'natural-exponential', 'bent-identity'];
 
       default:
       possible_types = ['tanh', 'arctan', 'logistic'];
@@ -83,8 +83,9 @@ module.exports = function (type) {
     break;
 
     case "bent-identity":
-    this.evaluate = function (x) {(Math.sqrt(Math.pow(x, 2) + 1)-1)/2 + x};
-    this.derivative = function (x) {x/(2*Math.sqrt(Math.pow(x, 2) + 1)) + 1};
+    this.evaluate = function (x) {return (Math.sqrt(Math.pow(x, 2) + 1)-1)/2 + x};
+    this.derivative = function (x) {return x/(2*Math.sqrt(Math.pow(x, 2) + 1)) + 1};
+    break;
 
     case "gaussian":
     this.evaluate = function (x) {return Math.pow(Math.E, -Math.pow(x, 2))};
@@ -94,6 +95,11 @@ module.exports = function (type) {
     case "sin":
     this.evaluate = function (x) {return Math.sin(x)};
     this.derivative = function (x) {return Math.cos(x)};
+    break;
+
+    case "cos":
+    this.evaluate = function (x) {return Math.cos(x)};
+    this.derivative = function (x) {return -Math.sin(x)};
     break;
 
     case "softplus":
@@ -149,6 +155,7 @@ module.exports = function (type) {
     break;
 
     default:
+    type = 'identity';
     this.evaluate = function (x) {return x};
     this.derivative = function (x) {return 1};
     break;
