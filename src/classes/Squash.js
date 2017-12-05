@@ -98,7 +98,7 @@ module.exports = function (type) {
 
     case "softplus":
     this.evaluate = function (x) {return Math.logab(1 + Math.pow(Math.E, x), Math.E)};
-    this.derivative = function (x) {return 1/(1 + Math.pow(Math.E, x))};
+    this.derivative = function (x) {return 1/(1 + Math.pow(Math.E, -x))};
     break;
 
     // Experimental
