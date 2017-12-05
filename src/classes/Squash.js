@@ -48,7 +48,7 @@ module.exports = function (type) {
     break;
 
     case "hard-tanh":
-    this.evaluate = function (x) {return (x <= 1 && x >= -1) ? x : x};
+    this.evaluate = function (x) {return (x <= 1 && x >= -1) ? x : (x <= -1) ? -1 : 1};
     this.derivative = function (x) {return (x <= 1 && x >= -1) ? 1 : 0};
     break;
 
