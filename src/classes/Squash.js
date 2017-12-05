@@ -159,6 +159,16 @@ module.exports = function (type) {
     this.derivative = function (x) {return (1 - Math.pow(Math.tanh(2 * Math.sin(x)), 2)) * 2 * Math.cos(x)};
     break;
 
+    case "stippity-step-simplified":
+    this.evaluate = function (x) {return 2 * Math.sin(x) + x};
+    this.derivative = function (x) {return 2 * Math.cos(x) + 1};
+    break;
+
+    case "stippity-step-3":
+    this.evaluate = function (x) {return Math.pow(Math.sin(x), 3) + (0.5 * x)};
+    this.derivative = function (x) {return 3 * Math.pow(Math.sin(x), 2) * Math.cos(x) + 0.5};
+    break;
+
     default:
     type = 'identity';
     this.evaluate = function (x) {return x};
