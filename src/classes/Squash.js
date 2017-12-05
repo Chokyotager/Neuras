@@ -48,8 +48,8 @@ module.exports = function (type) {
     break;
 
     case "hard-tanh":
-    this.evaluate = function (x) {return (x <= 1 && x >= -1) ? x : x/Math.abs(x)};
-    this.derivative = function (x) {return (x <= 1 && x >= 1) ? 1 : 0};
+    this.evaluate = function (x) {return (x <= 1 && x >= -1) ? x : x};
+    this.derivative = function (x) {return (x <= 1 && x >= -1) ? 1 : 0};
     break;
 
     case "leaky-relu":
@@ -68,7 +68,7 @@ module.exports = function (type) {
     break;
 
     case "signum":
-    this.evaluate = function (x) {return (x < 0) ? 0 : -1};
+    this.evaluate = function (x) {return (x < 0) ? -1 : 1};
     this.derivative = function (x) {return (x === 0) ? 10e30 : 0};
     break;
 
