@@ -52,29 +52,9 @@ module.exports = function (type) {
     this.derivative = function (x) {return (x <= 1 && x >= 1) ? 1 : 0};
     break;
 
-    case "cube-root":
-    this.evaluate = function (x) {return Math.cbrt(x)};
-    this.derivative = function (x) {return 1/(3 * Math.pow(x, 2/3))};
-    break;
-
     case "leaky-relu":
     this.evaluate = function (x) {return Math.max(0, x)};
     this.derivative = function (x) {return (x < 0) ? 0.01 : 1};
-    break;
-
-    case "cube":
-    this.evaluate = function (x) {return Math.pow(x, 3)};
-    this.derivative = function (x) {return 3 * Math.pow(x, 2)};
-    break;
-
-    case "square":
-    this.evaluate = function (x) {return Math.pow(x, 2)};
-    this.derivative = function (x) {return 2 * x};
-    break;
-
-    case "modulus":
-    this.evaluate = function (x) {return x % Math.random() * 10};
-    this.derivative = function (x) {return 1};
     break;
 
     case "sinc":
@@ -97,6 +77,42 @@ module.exports = function (type) {
     this.derivative = function (x) {return (x < 0) ? 0 : 1};
     break;
 
+    case "identity":
+    this.evaluate = function (x) {return x};
+    this.derivative = function (x) {return 1};
+    break;
+
+    case "bent-identity":
+    this.evaluate = function (x) {(Math.sqrt(Math.pow(x, 2) + 1)-1)/2 + x};
+    this.derivative = function (x) {x/(2*Math.sqrt(Math.pow(x, 2) + 1)) + 1};
+
+    case "gaussian":
+    this.evaluate = function (x) {return Math.pow(Math.E, -Math.pow(x, 2))};
+    this.derivative = function (x) {return -2 * x * Math.pow(Math.E, -Math.pow(x, 2))};
+    break;
+
+    case "sin":
+    this.evaluate = function (x) {return Math.sin(x)};
+    this.derivative = function (x) {return Math.cos(x)};
+    break;
+
+    case "softplus":
+    this.evaluate = function (x) {return Math.logab(1 + Math.pow(Math.E, x), Math.E)};
+    this.derivative = function (x) {return 1/(1 + Math.pow(Math.E, x))};
+    break;
+
+    // Experimental
+
+    case "smooth-cube":
+    this.evaluate = function (x) {return Math.pow(x, 2)/Math.sin(x)};
+    this.derivative = function (x) {return (x*(2*Math.sin(x)+Math.cos(x)))/Math.pow(Math.sin(x), 2)};
+    break;
+
+    case "hard-identity":
+    this.evaluate = function (x) {return 4 * x};
+    this.derivative = function (x) {return 4};
+    break;
+
     case "natural-exponential":
     this.evaluate = function (x) {return Math.pow(Math.E, x)};
     this.derivative = function (x) {return Math.pow(Math.E, x)};
@@ -112,43 +128,32 @@ module.exports = function (type) {
     this.derivative = function (x) {return (x*Math.logab(Math.E, 10))/((Math.abs(x)+10e-30)*Math.abs(x))};
     break;
 
-    case "identity":
-    this.evaluate = function (x) {return x};
+    case "cube":
+    this.evaluate = function (x) {return Math.pow(x, 3)};
+    this.derivative = function (x) {return 3 * Math.pow(x, 2)};
+    break;
+
+    case "square":
+    this.evaluate = function (x) {return Math.pow(x, 2)};
+    this.derivative = function (x) {return 2 * x};
+    break;
+
+    case "modulus":
+    this.evaluate = function (x) {return x % Math.random() * 10};
     this.derivative = function (x) {return 1};
     break;
 
-    case "hard-identity":
-    this.evaluate = function (x) {return 4 * x};
-    this.derivative = function (x) {return 4};
+    case "cube-root":
+    this.evaluate = function (x) {return Math.cbrt(x)};
+    this.derivative = function (x) {return 1/(3 * Math.pow(x, 2/3))};
     break;
-
-    case "bent-identity":
-    this.evaluate = function (x) {(Math.sqrt(Math.pow(x, 2) + 1)-1)/2 + x};
-    this.derivative = function (x) {x/(2*Math.sqrt(Math.pow(x, 2) + 1)) + 1};
-
-    case "gaussian":
-    this.evaluate = function (x) {return Math.pow(Math.E, Math.pow(-x, 2))};
-    this.derivative = function (x) {return -2 * x * Math.pow(Math.E, Math.pow(-x, 2))};
-
-    case "sin":
-    this.evaluate = function (x) {return Math.sin(x)};
-    this.derivative = function (x) {return Math.cos(x)};
-    break;
-
-    case "softplus":
-    this.evaluate = function (x) {return Math.logab(1 + Math.pow(Math.E, x), Math.E)};
-    this.derivative = function (x) {return 1/(1 + Math.pow(Math.E, x))};
-
-    case "smooth-cube":
-    this.evaluate = function (x) {return Math.pow(x, 2)/Math.sin(x)};
-    this.derivative = function (x) {return (x*(2*Math.sin(x)+Math.cos(x)))/Math.pow(Math.sin(x), 2)};
 
     default:
     this.evaluate = function (x) {return x};
     this.derivative = function (x) {return 1};
     break;
 
-  }
+  };
   this.type = type;
   this.forward = function (x) {
     return this.evaluate(x);
