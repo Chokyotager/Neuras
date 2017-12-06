@@ -19,9 +19,19 @@ module.exports = function (type) {
 
       case "extended++":
       possible_types = ['tanh', 'arctan', 'logistic', 'sinc', 'sin', 'logistic', 'gaussian', 'binary-step', 'signum', 'softplus'];
+      break;
+
+      case "sinusoidal":
+      possible_types = ['sin', 'cos', 'stippity-step', 'stippity-step-simplified', 'stippity-step-3'];
+      break;
+
+      case "rangeless":
+      possible_types: ['stippity-step', 'stippity-step-simplified', 'stippity-step-3', 'leaky-relu', 'relu'];
+      break;
 
       case "regression":
       possible_types = ['leaky-relu', 'softplus', 'identity', 'cube', 'natural-exponential', 'bent-identity'];
+      break;
 
       default:
       possible_types = ['tanh', 'arctan', 'logistic'];
