@@ -5,10 +5,10 @@ var Buffer = require('./Buffer');
 module.exports = function () {
   this.neurones = new Array();
 
-  this.addNeurones = function (neurones, squash) {
+  this.addNeurones = function (neurones, squash, params) {
     (squash === undefined) ? squash = 'tanh' : null;
     for (var i = 0; i < neurones; i++) {
-      this.neurones.push(new Neurone().changeSquash(squash));
+      this.neurones.push(new Neurone().changeSquash(squash, params));
     };
     return this;
   };

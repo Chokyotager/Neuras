@@ -1,12 +1,14 @@
-module.exports = function (type) {
+module.exports = function (type, parameters) {
   Math.logab = function (exponent, base) {
     return Math.log(exponent) / Math.log(base);
   };
 
   type = type.toLowerCase();
 
-  if (type.substring(0, 6) === 'random') {
+  if (type.substring(0, 7) === 'random-') {
+    typeof parameters !== 'object' ? parameters = new Object() : null;
     var enumerate = type.substring(7, type.length);
+
     var possible_types = new Array();
     switch (enumerate) {
       case "primitive":
@@ -33,10 +35,31 @@ module.exports = function (type) {
       possible_types = ['leaky-relu', 'softplus', 'identity', 'cube', 'natural-exponential', 'bent-identity'];
       break;
 
+      case "custom":
+      possible_types = new Array();
+      if (parameters.include === undefined) {
+        throw "[Neuras] (Params).include should be defined for Squash parameters!";
+      };
+      break;
+
       default:
       possible_types = ['tanh', 'arctan', 'logistic'];
       break;
     };
+
+    // Evaluate parameters
+    if (parameters.exclude !== undefined) {
+      for (var i = 0; i < parameters.exclude.length; i++) {
+        for (var i = 0; i < possible_types; i++) {
+          if (parameters.exclude[i] === possible_types) {
+            possible_types.splice(i, 1);
+          };
+        };
+      };
+    };
+
+    parameters.include !== undefined ? possible_types = possible_types.concat(parameters.include) : null;
+
     type = possible_types[Math.round(Math.random() * (possible_types.length-1))];
   };
 
@@ -63,8 +86,14 @@ module.exports = function (type) {
     break;
 
     case "leaky-relu":
-    this.evaluate = function (x) {return Math.max(0, x)};
+    this.evaluate = function (x) {return (x < 0) ? 0.01 * x : x};
     this.derivative = function (x) {return (x < 0) ? 0.01 : 1};
+    break;
+
+    case "randomised-leaky-relu":
+    this.rlrelu = Math.random();
+    this.evaluate = function (x) {return (x < 0) ? this.rlrelu * x : x};
+    this.derivative = function (x) {return (x < 0) ? this.rlrelu : 1};
     break;
 
     case "sinc":
@@ -169,14 +198,34 @@ module.exports = function (type) {
     this.derivative = function (x) {return (1 - Math.pow(Math.tanh(2 * Math.sin(x)), 2)) * 2 * Math.cos(x)};
     break;
 
-    case "stippity-step-simplified":
+    case "stippity-step-3":
+    this.evaluate = function (x) {return Math.pow(Math.sin(x), 3) + (0.5 * x)};
+    this.derivative = function (x) {return 3 * Math.pow(Math.sin(x), 2) * Math.cos(x) + 0.5};
+    break;
+
+    case "continuous-tanh":
     this.evaluate = function (x) {return 2 * Math.sin(x) + x};
     this.derivative = function (x) {return 2 * Math.cos(x) + 1};
     break;
 
-    case "stippity-step-3":
-    this.evaluate = function (x) {return Math.pow(Math.sin(x), 3) + (0.5 * x)};
-    this.derivative = function (x) {return 3 * Math.pow(Math.sin(x), 2) * Math.cos(x) + 0.5};
+    case "continuous-bipolar-tanh":
+    this.evaluate = function (x) {return 1/Math.PI * Math.sin(Math.PI * x) + x};
+    this.derivative = function (x) {return Math.cos(Math.PI * x) + 1};
+    break;
+
+    case "steps":
+    this.evaluate = function (x) {return 0.2 * Math.pow(Math.sin(x), 2) + x};
+    this.derivative = function (x) {return 0.4 * Math.sin(x) * Math.cos(x) + 1};
+    break;
+
+    // Custom & default
+    case "custom":
+    try {
+      this.evaluate = parameters.evaluate;
+      this.derivative = parameters.derivative;
+    } catch (err) {
+      throw "[Neuras] Caught exception in custom Squash: " + err;
+    };
     break;
 
     default:

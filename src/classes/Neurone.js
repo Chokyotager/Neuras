@@ -201,8 +201,8 @@ module.exports = function () {
     return this;
   };
 
-  this.changeSquash = function (sq) {
-    this.squash = new Squash(sq);
+  this.changeSquash = function (sq, params) {
+    this.squash = new Squash(sq, params);
     return this;
   };
 
