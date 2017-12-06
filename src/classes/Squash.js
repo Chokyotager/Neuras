@@ -26,7 +26,7 @@ module.exports = function (type) {
       break;
 
       case "rangeless":
-      possible_types: ['stippity-step', 'stippity-step-simplified', 'stippity-step-3', 'leaky-relu', 'relu'];
+      possible_types = ['stippity-step', 'stippity-step-simplified', 'stippity-step-3', 'leaky-relu', 'relu', 'identity'];
       break;
 
       case "regression":
