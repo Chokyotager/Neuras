@@ -208,8 +208,8 @@ module.exports = function (type, parameters) {
     break;
 
     case "continuous-tanh":
-    this.evaluate = function (x) {return 2 * Math.sin(x) + x};
-    this.derivative = function (x) {return 2 * Math.cos(x) + 1};
+    this.evaluate = function (x) {return 1 * Math.sin(x) + x};
+    this.derivative = function (x) {return 1 * Math.cos(x) + 1};
     break;
 
     case "continuous-bipolar-tanh":
