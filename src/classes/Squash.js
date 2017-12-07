@@ -60,6 +60,10 @@ module.exports = function (type, parameters) {
 
     parameters.include !== undefined ? possible_types = possible_types.concat(parameters.include) : null;
 
+    if (possible_types.length < 1) {
+      throw "[Neuras] Should have at least one squash type in randomiser!";
+    };
+
     type = possible_types[Math.round(Math.random() * (possible_types.length-1))];
   };
 
