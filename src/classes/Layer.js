@@ -307,6 +307,15 @@ module.exports = function () {
     return count;
   };
 
+  this.seed = function (seed) {
+    for (var i = 0; i < this.neurones.length; i++) {
+      if (this.neurones[i].meta.type !== 'gate' && this.neurones[i].meta.type !== 'buffer') {
+        this.neurones[i].seed(seed + i);
+      };
+    };
+    return this;
+  };
+
   this.forward = function (v) {
     var output = new Array();
       if (v === undefined) {

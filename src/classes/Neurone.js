@@ -1,5 +1,6 @@
 var Squash = require('./Squash');
 var uuid = require('../libs/uuid_generator');
+var seeder = require('../libs/seed');
 var NMatrix = require('./NeuroneMatrix');
 //var Input = require('./Input');
 
@@ -245,6 +246,13 @@ module.exports = function () {
           this.backconnections.splice(j, 1);
         };
       };
+    };
+    return this;
+  };
+
+  this.seed = function (seed) {
+    for (var i = 0; i < this.backconnections.length; i++) {
+      this.backconnections[i].weight = 2 * (seeder(seed + i) - 0.5);
     };
     return this;
   };

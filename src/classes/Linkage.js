@@ -185,6 +185,12 @@ module.exports = function (chronology, autolink) {
 
   };
 
+  this.seed = function (seed) {
+    for (var i = 0; i < this.chronology.length; i++) {
+      this.chronology[i].seed(seed + i);
+    };
+  };
+
   this.setDerivativeChain = function (type, layer, chain_m) {
 
     if (typeof layer !== 'number') {
