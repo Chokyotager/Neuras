@@ -187,7 +187,8 @@ module.exports = function (chronology, autolink) {
 
   this.seed = function (seed) {
 
-    seed === undefined ? seed = 1 : null;
+    seed === undefined ? seed = '1' : null;
+    typeof seed !== 'string' ? seed = seed.toString() : null;
 
     for (var i = 0; i < this.chronology.length; i++) {
       this.chronology[i].seed(seed + i);
