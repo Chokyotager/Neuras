@@ -25,8 +25,8 @@ module.exports = function () {
     };
   };
 
-  this.selfconnect = function () {
-    this.connect(this);
+  this.selfconnect = function (probability) {
+    this.connect(this, probability);
     return this;
   };
 
