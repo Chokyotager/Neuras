@@ -232,6 +232,11 @@ module.exports = function (type, parameters) {
     this.derivative = function (x) {return Math.cos(Math.PI * x) + 1};
     break;
 
+    case "disturbed-continuous-tanh":
+    this.evaluate = function (x) {return 0.1 * Math.sin(10 * x) + x};
+    this.derivative = function (x) {return Math.cos(10 * x) + 1};
+    break;
+
     case "incremented-sin":
     this.evaluate = function (x) {return 0.5 * Math.sin(x) + 0.5};
     this.derivative = function (x) {return 0.5 * Math.cos(x)};
