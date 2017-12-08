@@ -7,5 +7,5 @@ module.exports = function (seed) {
       seed += str.charCodeAt(i);
     };
   };
-  return ((seed * 15486773) % 1299841) / 1299841;
+  return ((seed * 179426407) % 32416190071) / 32416190071;
 };
