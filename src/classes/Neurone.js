@@ -252,7 +252,10 @@ module.exports = function () {
 
   this.seed = function (seed) {
     for (var i = 0; i < this.backconnections.length; i++) {
-      this.backconnections[i].weight = 2 * (seeder(seed + i) - 0.5);
+      this.backconnections[i].weight !== undefined ? this.backconnections[i].weight = 2 * (seeder(seed + i) - 0.5) : null;
+      if (this.backconnections[i].neurone.type === 'bias') {
+        this.backconnections[i].neurone.value = 2 * (seeder(seed + 2*(i+1)) - 0.5);
+      };
     };
     return this;
   };

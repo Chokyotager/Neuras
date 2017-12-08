@@ -186,9 +186,13 @@ module.exports = function (chronology, autolink) {
   };
 
   this.seed = function (seed) {
+
+    seed === undefined ? seed = 1 : null;
+
     for (var i = 0; i < this.chronology.length; i++) {
       this.chronology[i].seed(seed + i);
     };
+    return this;
   };
 
   this.setDerivativeChain = function (type, layer, chain_m) {

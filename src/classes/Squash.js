@@ -150,7 +150,7 @@ module.exports = function (type, parameters) {
     this.derivative = function (x) {return 1/(1 + Math.pow(Math.E, -x))};
     break;
 
-    case "normal":
+    case "adaptive-normal":
     this.norm_max = 1;
     this.evaluate = function (x) {this.norm_max = Math.max(Math.abs(x), this.norm_max); return x/this.norm_max};
     this.derivative = function (x) {return -x/this.norm_max};
