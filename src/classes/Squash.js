@@ -161,9 +161,9 @@ module.exports = function (type, parameters) {
     if (parameters === undefined || typeof parameters.max !== 'number') {
       throw "[Neuras] Squash (Params).max should be a real number for normalisation!"
     };
-    this.norm_max = parameters.value;
+    this.norm_max = parameters.max;
     this.norm_min = typeof parameters.min === 'number' ? parameters.min : 0;
-    this.evaluate = function (x) {return x/this.norm_max};
+    this.evaluate = function (x) {return (x - this.norm_min)/this.norm_max};
     this.derivative = function (x) {return -x/this.norm_max};
     break;
 
