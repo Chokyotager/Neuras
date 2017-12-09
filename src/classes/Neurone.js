@@ -1,6 +1,6 @@
 var Squash = require('./Squash');
+var Seeder = require('./Seeder');
 var uuid = require('../libs/uuid_generator');
-var seeder = require('../libs/seed');
 var NMatrix = require('./NeuroneMatrix');
 //var Input = require('./Input');
 
@@ -35,13 +35,15 @@ module.exports = function () {
 
   //Object.freeze(this.meta);
 
-  this.messUpWeights = function (probability, delta) {
+  this.messUpWeights = function (probability, delta, seed) {
     (typeof probability !== 'number') ? probability = 1 : null;
     (typeof delta !== 'number') ? delta = 0.05 : null;
 
+    seed = new Seeder().from(seed);
+
     for (var i = 0; i < this.backconnections.length; i++) {
       if (this.backconnections[i].frozen === false) {
-        this.backconnections[i].weight -= this.backconnections[i].weight * (Math.random() - 0.5) * 2 * delta;
+        this.backconnections[i].weight -= this.backconnections[i].weight * (seed.random() - 0.5) * 2 * delta;
       };
     };
 
@@ -75,6 +77,7 @@ module.exports = function () {
     if (weighted == true) {
       push.weight = 2 * (Math.random()-.5);
     };
+
     if (typeof bias != 'number') {
       bias = 2 * (Math.random()-.5);
     };
@@ -107,10 +110,11 @@ module.exports = function () {
     return output;
   };
 
-  this.jumbleTrainRate = function (probability) {
+  this.jumbleTrainRate = function (probability, seed) {
     (typeof probability !== 'number') ? probability = 1 : null;
+    seed = new Seeder().from(seed);
     for (var i = 0; i < this.backconnections.length; i++) {
-      if (Math.random() <= probability && this.backconnections[i].frozen === false) {
+      if (seed.add(1).random() <= probability && this.backconnections[i].frozen === false) {
         this.backconnections[i].local_trainrate = Math.random();
       };
     };
@@ -142,14 +146,16 @@ module.exports = function () {
     return this;
   };
 
-  this.freeze = function (probability) {
+  this.freeze = function (probability, seed) {
     // freezes weights of the neurone
+
+    seed = new Seeder().from(seed);
 
     var frozen = new Array();
     (typeof probability !== 'number') ? probability = 1 : null;
 
     for (var i = 0; i < this.backconnections.length; i++) {
-      if (Math.random() <= probability && this.backconnections[i].weight !== undefined && this.backconnections[i].frozen == false) {
+      if (seed.add(1).random() <= probability && this.backconnections[i].weight !== undefined && this.backconnections[i].frozen == false) {
         this.backconnections[i].frozen = true;
         frozen.push(this.backconnections[i]);
       };
@@ -157,13 +163,14 @@ module.exports = function () {
     return frozen;
   };
 
-  this.unfreeze = function (probability) {
+  this.unfreeze = function (probability, seed) {
     // freezes weights of the neurone
     var frozen = new Array();
+    seed = new Seeder().from(seed);
     (typeof probability !== 'number') ? probability = 1 : null;
 
     for (var i = 0; i < this.backconnections.length; i++) {
-      if (Math.random() <= probability && this.backconnections[i].weight !== undefined && this.backconnections[i].frozen == true) {
+      if (seed.add(1).random() <= probability && this.backconnections[i].weight !== undefined && this.backconnections[i].frozen == true) {
         this.backconnections[i].frozen = false;
         frozen.push(this.backconnections[i]);
       };
@@ -251,10 +258,12 @@ module.exports = function () {
   };
 
   this.seed = function (seed) {
+    seed = new Seeder().from(seed);
+
     for (var i = 0; i < this.backconnections.length; i++) {
-      this.backconnections[i].weight !== undefined ? this.backconnections[i].weight = 2 * (seeder(seed + i) - 0.5) : null;
+      this.backconnections[i].weight !== undefined ? this.backconnections[i].weight = 2 * seed.add(1).random() : null;
       if (this.backconnections[i].neurone.type === 'bias') {
-        this.backconnections[i].neurone.value = 2 * (seeder(seed + 2*(i+1)) - 0.5);
+        this.backconnections[i].neurone.value = 2 * (seed.add(1).random() - 0.5);
       };
     };
     return this;

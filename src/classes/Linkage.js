@@ -1,11 +1,12 @@
 var Layer = require('./Layer');
+var Seeder = require('./Seeder');
 
 module.exports = function (chronology, autolink) {
   // chronology == layers to forward in order
 
   if (autolink == true) {
     for (var i = 0; i < chronology.length - 1; i++) {
-      chronology[i].connect(chronology[i + 1])
+      chronology[i].connect(chronology[i + 1]);
     };
   };
 
@@ -72,20 +73,24 @@ module.exports = function (chronology, autolink) {
     return Object.assign( Object.create( Object.getPrototypeOf(this)), this);
   };
 
-  this.jumbleTrainRate = function (probability) {
+  this.jumbleTrainRate = function (probability, seed) {
     (typeof probability !== 'number') ? probability = 1 : null;
 
+    seed = new Seeder().from(seed);
+
     for (var i = 0; i < chronology.length; i++) {
-      chronology[i].jumbleTrainRate(probability);
+      chronology[i].jumbleTrainRate(probability, seed.add(1));
     };
   };
 
-  this.messUpWeights = function (probability, delta) {
+  this.messUpWeights = function (probability, delta, seed) {
     (typeof probability !== 'number') ? probability = 1 : null;
     (typeof delta !== 'number') ? delta = 0.05 : null;
 
+    seed = new Seeder().from(seed);
+
     for (var i = 0; i < chronology.length; i++) {
-      chronology[i].messUpWeights(probability, delta);
+      chronology[i].messUpWeights(probability, delta, seed.add(1));
     };
   };
 
@@ -131,16 +136,18 @@ module.exports = function (chronology, autolink) {
 
   };
 
-  this.connect = function (unit, probability) {
+  this.connect = function (unit, probability, seed) {
 
     if (typeof probability !== 'number') {
       probability = 1;
     };
 
+    seed = new Seeder().from(seed);
+
     var output = this.chronology[this.chronology.length - 1];
 
     for (var i = 0; i < output.neurones.length; i++) {
-      if (Math.random() < probability) {
+      if (seed.add(1).random() < probability) {
         if (unit.meta.type == 'linkage') {
           output.connect(unit.chronology[0]);
         } else {
@@ -161,37 +168,44 @@ module.exports = function (chronology, autolink) {
     return last_layer.getUnsquashedOutput();
   };
 
-  this.dropoutNeurones = function (probability) {
+  this.dropoutNeurones = function (probability, seed) {
 
     if (typeof probability !== 'number') {
       throw "[Neuras] Probability for dropouts cannot be undefined!";
     };
 
+    seed = new Seeder().from(seed);
+
     for (var i = 0; i < this.chronology.length; i++) {
-      this.chronology[i].dropoutNeurones(probability);
+      this.chronology[i].dropoutNeurones(probability, seed.add(1));
     };
 
   };
 
-  this.dropoutWeights = function (probability) {
+  this.dropoutWeights = function (probability, seed) {
 
     if (typeof probability !== 'number') {
       throw "[Neuras] Probability for dropouts cannot be undefined!";
     };
 
+    seed = new Seeder().from(seed);
+
     for (var i = 0; i < this.chronology.length; i++) {
-      this.chronology[i].dropoutWeights(probability);
+      this.chronology[i].dropoutWeights(probability, seed.add(1));
     };
 
   };
 
   this.seed = function (seed) {
 
-    seed === undefined ? seed = '1' : null;
-    typeof seed !== 'string' ? seed = seed.toString() : null;
+    if (seed === undefined) {
+      throw "[Neuras] Seed parameter should be defined!";
+    };
+
+    seed = new Seeder().from(seed);
 
     for (var i = 0; i < this.chronology.length; i++) {
-      this.chronology[i].seed(seed + i);
+      this.chronology[i].seed(seed.add(1));
     };
     return this;
   };

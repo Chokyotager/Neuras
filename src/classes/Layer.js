@@ -1,6 +1,7 @@
 var Neurone = require('./Neurone');
 var Gate = require('./Gate');
 var Buffer = require('./Buffer');
+var Seeder = require('./Seeder');
 
 module.exports = function () {
   this.neurones = new Array();
@@ -25,8 +26,9 @@ module.exports = function () {
     };
   };
 
-  this.selfconnect = function (probability) {
-    this.connect(this, probability);
+  this.selfconnect = function (probability, seed) {
+    seed = new Seeder().from(seed);
+    this.connect(this, probability, seed.add(1));
     return this;
   };
 
@@ -54,14 +56,16 @@ module.exports = function () {
     return this;
   };
 
-  this.addBiases = function (probability, weighted, bias) {
+  this.addBiases = function (probability, weighted, seed, bias) {
 
     if (weighted === undefined) {
       weighted = false;
     };
 
+    seed = new Seeder().from(seed);
+
     for (var i = 0; i < this.neurones.length; i++) {
-      if (Math.random() <= probability && this.neurones[i] instanceof Neurone) {
+      if (seed.add(1).random() <= probability && this.neurones[i] instanceof Neurone) {
         this.neurones[i].addBias(weighted, bias);
       };
     };
@@ -84,92 +88,103 @@ module.exports = function () {
     return this;
   };
 
-  this.dropoutNeurones = function (probability) {
+  this.dropoutNeurones = function (probability, seed) {
 
     if (typeof probability !== 'number') {
       throw "[Neuras] Probability for dropouts cannot be undefined!";
     };
 
+    seed = new Seeder().from(seed);
+
     for (var i = 0; i < this.neurones.length; i++) {
-      if (Math.random() <= probability) {
+      if (seed.add(1).random() <= probability) {
         if (this.neurones[i].meta.type === 'neurone') {
           this.neurones[i].dropout(1);
         } else if (this.neurones[i].meta.type === 'linkage') {
-          this.neurones[i].dropoutNeurones(probability);
+          this.neurones[i].dropoutNeurones(probability, seed);
         };
       };
     };
   };
 
-  this.jumbleTrainRate = function (probability) {
+  this.jumbleTrainRate = function (probability, seed) {
 
     (typeof probability !== 'number') ? probability = 1 : null;
 
+    seed = new Seeder().from(seed);
+
     for (var i = 0; i < this.neurones.length; i++) {
-      if (Math.random() <= probability && (this.neurones[i].meta.type === 'neurone' || this.neurones[i].meta.type === 'linkage')) {
-        this.neurones[i].jumbleTrainRate(probability);
+      if (seed.add(1).random() <= probability && (this.neurones[i].meta.type === 'neurone' || this.neurones[i].meta.type === 'linkage')) {
+        this.neurones[i].jumbleTrainRate(probability, seed);
       };
     };
   };
 
-  this.messUpWeights = function (probability, delta) {
+  this.messUpWeights = function (probability, delta, seed) {
 
     (typeof probability !== 'number') ? probability = 1 : null;
     (typeof delta !== 'number') ? delta = 0.05 : null;
 
+    seed = new Seeder().from(seed);
+
     for (var i = 0; i < this.neurones.length; i++) {
-      if (Math.random() <= probability && (this.neurones[i].meta.type === 'neurone' || this.neurones[i].meta.type === 'linkage')) {
-        this.neurones[i].messUpWeights(probability, delta);
+      if (seed.add(1).random() <= probability && (this.neurones[i].meta.type === 'neurone' || this.neurones[i].meta.type === 'linkage')) {
+        this.neurones[i].messUpWeights(probability, delta, seed);
       };
     };
   };
 
-  this.dropoutWeights = function (probability) {
+  this.dropoutWeights = function (probability, seed) {
     if (typeof probability !== 'number') {
       throw "[Neuras] Probability for dropouts cannot be undefined!";
     };
 
+    seed = new Seeder().from(seed);
+
     for (var i = 0; i < this.neurones.length; i++) {
-      if (Math.random() <= probability) {
+      if (seed.add(1).random() <= probability) {
         if (this.neurones[i].meta.type === 'neurone') {
-          this.neurones[i].dropout(probability);
+          this.neurones[i].dropout(probability, seed.add(1));
         } else if (this.neurones[i].meta.type === 'linkage') {
-          this.neurones[i].dropoutWeights(probability);
+          this.neurones[i].dropoutWeights(probability, seed.add(1));
         };
       };
     };
   };
 
-  this.freezeNeurones = function (probability) {
+  this.freezeNeurones = function (probability, seed) {
 
     (typeof probability !== 'number') ? probability = 1 : null;
+    seed = new Seeder().from(seed);
 
     for (var i = 0; i < this.neurones.length; i++) {
-      if (Math.random() <= probability && this.neurones[i] instanceof Neurone) {
+      if (seed.add(1).random() <= probability && this.neurones[i] instanceof Neurone) {
         this.neurones[i].freeze();
       };
     };
     return this;
   }
 
-  this.freezeWeights = function (probability) {
+  this.freezeWeights = function (probability, seed) {
 
     (typeof probability !== 'number') ? probability = 1 : null;
+    seed = new Seeder().from(seed);
 
     for (var i = 0; i < this.neurones.length; i++) {
       if (this.neurones[i] instanceof Neurone) {
-        this.neurones[i].freeze(probability);
+        this.neurones[i].freeze(probability, seed.add(1));
       };
     };
     return this;
   };
 
-  this.unfreezeNeurones = function  (probability) {
+  this.unfreezeNeurones = function  (probability, seed) {
 
     (typeof probability !== 'number') ? probability = 1 : null;
+    seed = new Seeder().from(seed);
 
     for (var i = 0; i < this.neurones.length; i++) {
-      if (Math.random() <= probability) {
+      if (seed.add(1).random() <= probability) {
         if (this.neurones[i] instanceof Neurone) {
           this.neurones[i].unfreeze();
         };
@@ -178,13 +193,14 @@ module.exports = function () {
     return this;
   };
 
-  this.unfreezeWeights = function  (probability) {
+  this.unfreezeWeights = function  (probability, seed) {
 
     (typeof probability !== 'number') ? probability = 1 : null;
+    seed = new Seeder().from(seed);
 
     for (var i = 0; i < this.neurones.length; i++) {
       if (this.neurones[i] instanceof Neurone) {
-        this.neurones[i].unfreeze(probability);
+        this.neurones[i].unfreeze(probability, seed.add(1));
       };
     };
     return this;
@@ -208,7 +224,7 @@ module.exports = function () {
     return this;
   };
 
-  this.connect = function (layer, probability) {
+  this.connect = function (layer, probability, seed) {
     if (!(layer instanceof module.exports)) {
       throw "[Neuras] Can only connect to Layer classes!";
     };
@@ -217,9 +233,11 @@ module.exports = function () {
       probability = 1;
     };
 
+    seed = new Seeder().from(seed);
+
     for (var i = 0; i < this.neurones.length; i++) {
       for (var j = 0; j < layer.neurones.length; j++) {
-        if (Math.random() <= probability) {
+        if (seed.add(1).random() <= probability) {
           if (layer.neurones[j].meta.type === 'linkage') {
             this.connect(layer.neurones[j].chronology[0]);
           } else {
@@ -240,7 +258,7 @@ module.exports = function () {
     return this;
   };
 
-  this.connectSequentially = function (layer, probability) {
+  this.connectSequentially = function (layer, probability, seed) {
     if (!(layer instanceof module.exports)) {
       throw "[Neuras] Can only connect to Layer classes!";
     };
@@ -249,11 +267,13 @@ module.exports = function () {
       probability = 1;
     };
 
+    seed = new Seeder().from(seed);
+
     var potential_connections = Math.min(this.neurones.length, layer.neurones.length);
 
     for (var i = 0; i < potential_connections; i++) {
-      if (Math.random() <= probability) {
-        this.neurones[i].connect(layer.neurones[i]);
+      if (seed.add(1).random() <= probability) {
+        this.neurones[i].connect(layer.neurones[i], seed);
       };
     };
     return layer;
@@ -308,9 +328,10 @@ module.exports = function () {
   };
 
   this.seed = function (seed) {
+    seed = new Seeder().from(seed);
     for (var i = 0; i < this.neurones.length; i++) {
       if (this.neurones[i].meta.type !== 'gate' && this.neurones[i].meta.type !== 'buffer') {
-        this.neurones[i].seed(seed + i);
+        this.neurones[i].seed(seed.add(1));
       };
     };
     return this;
