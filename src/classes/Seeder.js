@@ -6,7 +6,7 @@ module.exports = function (seed) {
     if (val instanceof module.exports) {
       return val;
     } else if (val === undefined) {
-      return new module.exports(Math.random() * 1223);
+      return new module.exports(Math.random() * 27913279);
     } else {
       return new module.exports(val);
     };
