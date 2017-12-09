@@ -331,7 +331,7 @@ module.exports = function () {
     seed = new Seeder().from(seed);
     for (var i = 0; i < this.neurones.length; i++) {
       if (this.neurones[i].meta.type !== 'gate' && this.neurones[i].meta.type !== 'buffer') {
-        this.neurones[i].seed(seed.add(1));
+        this.neurones[i].seed(seed.add(3));
       };
     };
     return this;

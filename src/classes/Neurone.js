@@ -261,7 +261,7 @@ module.exports = function () {
     seed = new Seeder().from(seed);
 
     for (var i = 0; i < this.backconnections.length; i++) {
-      this.backconnections[i].weight !== undefined ? this.backconnections[i].weight = 2 * seed.add(1).random() : null;
+      this.backconnections[i].weight !== undefined ? this.backconnections[i].weight = 2 * (seed.add('W').random() - 0.5) : null;
     };
     return this;
   };
@@ -271,7 +271,7 @@ module.exports = function () {
 
     for (var i = 0; i < this.backconnections.length; i++) {
       if (this.backconnections[i].neurone.type === 'bias') {
-        this.backconnections[i].neurone.value = 2 * (seed.add(1).random() - 0.5);
+        this.backconnections[i].neurone.value = 2 * (seed.add('B').random() - 0.5);
       } else {
         // Biases are always appended to the front of the backconnections array
         break;

@@ -198,14 +198,10 @@ module.exports = function (chronology, autolink) {
 
   this.seed = function (seed) {
 
-    if (seed === undefined) {
-      throw "[Neuras] Seed parameter should be defined!";
-    };
-
     seed = new Seeder().from(seed);
 
     for (var i = 0; i < this.chronology.length; i++) {
-      this.chronology[i].seed(seed.add(1));
+      this.chronology[i].seed(seed.add('2'));
     };
     return this;
   };
