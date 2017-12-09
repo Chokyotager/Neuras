@@ -7,5 +7,6 @@ module.exports = {
   Linkage: require('./classes/Linkage'),
   Mentor: require('./classes/Mentor'),
   Canvas: require('./canvas'),
-  Architecture: require('./architecture')
-}
+  Architecture: require('./architecture'),
+  Seeder: require('./classes/Seeder')
+};

@@ -1,6 +1,6 @@
 module.exports = function (seed) {
 
-  this.seed = seed;
+  this.seed = seed !== undefined ? seed.toString() : Math.random().toString();
 
   this.from = function (val) {
     if (val instanceof module.exports) {
