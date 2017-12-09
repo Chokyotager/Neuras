@@ -257,16 +257,32 @@ module.exports = function () {
     return this;
   };
 
-  this.seed = function (seed) {
+  this.seedWeights = function (seed) {
     seed = new Seeder().from(seed);
 
     for (var i = 0; i < this.backconnections.length; i++) {
       this.backconnections[i].weight !== undefined ? this.backconnections[i].weight = 2 * seed.add(1).random() : null;
+    };
+    return this;
+  };
+
+  this.seedBiases = function (seed) {
+    seed = new Seeder().from(seed);
+
+    for (var i = 0; i < this.backconnections.length; i++) {
       if (this.backconnections[i].neurone.type === 'bias') {
         this.backconnections[i].neurone.value = 2 * (seed.add(1).random() - 0.5);
+      } else {
+        // Biases are always appended to the front of the backconnections array
+        break;
       };
     };
     return this;
+  };
+
+  this.seed = function (seed) {
+    this.seedWeights(seed);
+    this.seedBiases(seed);
   };
 
   this.setDerivativeChain = function (x) {

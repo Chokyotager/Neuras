@@ -70,7 +70,7 @@ module.exports = function (chronology, autolink) {
   };
 
   this.clone = function () {
-    return Object.assign( Object.create( Object.getPrototypeOf(this)), this);
+    return Object.assign(Object.create(Object.getPrototypeOf(this)), this);
   };
 
   this.jumbleTrainRate = function (probability, seed) {
