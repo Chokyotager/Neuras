@@ -6,7 +6,7 @@ module.exports = function (optimiser, properties) {
       this.optimisation = function (m) {
         var n = new Array();
         for (var i = 0; i < m.length; i++) {
-          n.push((m[i] + this.cache.prev[i]) / 2)
+          n.push((m[i] + this.cache.prev[i]) / 2);
         };
         this.cache.prev = n;
         return n;
@@ -28,6 +28,55 @@ module.exports = function (optimiser, properties) {
         };
         this.cache.prev = n;
         return n;
+      };
+      break;
+
+    case 'adagrad':
+      this.type = 'adagrad';
+      this.optimisation = function (m) {
+        var n = new Array();
+        var p = new Array();
+
+        if (this.cache.prev === m) {
+          this.cache.prev = new Array(m.length).fill(0);
+        };
+
+        for (var i = 0; i < m.length; i++) {
+          var nx = Math.sqrt(Math.abs(m[i]) + 10e-30 + this.cache.prev[i]);
+          console.log(nx);
+          n.push(nx);
+          p.push(1/nx * m[i]);
+        };
+        this.cache.prev = n;
+        return p;
+      };
+      break;
+
+    case 'adadelta':
+      this.type = 'adadelta';
+
+      if (this.options === undefined || typeof this.options.momentum !== 'number') {
+        throw "[Neuras] Momentum property in Optimiser should be defined!";
+      };
+
+      this.optimisation = function (m) {
+        var n = new Array();
+        var p = new Array();
+
+        if (this.cache.prev === m) {
+          this.cache.prev = new Array(m.length).fill(0);
+        };
+
+        for (var i = 0; i < m.length; i++) {
+          // power 2 gets rid of negatives in gradient
+          var jx = (1 - this.options.momentum) * Math.pow(m[i], 2) + this.options.momentum * this.cache.prev[i];
+          var numerator = Math.sqrt(this.cache.prev[i] + 10e-30);
+          var denominator = Math.sqrt(jx + 10e-30);
+          p.push(numerator/denominator * m[i] + m[i]);
+          n.push(jx);
+        };
+        this.cache.prev = n;
+        return p;
       };
       break;
 
