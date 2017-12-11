@@ -30,7 +30,18 @@ module.exports = function (linkage, json) {
 
     case "mean-quad":
       this.evaluate = function (y, yhat) {return 1/4 * Math.pow((y - yhat), 4)};
-      this.derivative = function (y, yhat) {return -Math.pow((y - yhat), 3)}
+      this.derivative = function (y, yhat) {return -Math.pow((y - yhat), 3)};
+      break;
+
+    case "abs":
+      this.evaluate = function (y, yhat) {return Math.abs(y - yhat)};
+      this.derivative = function (y, yhat) {return (y-yhat) !== 0 ? -(y-yhat)/Math.abs(y-yhat) : 0};
+      break;
+
+    case "log-cosh":
+      this.evaluate = function (y, yhat) {return Math.log(Math.cosh(y - yhat))};
+      this.derivative = function (y, yhat) {return -(Math.log(Math.E) * Math.sinh(y - yhat))/Math.cosh(y - yhat)};
+      break;
 
     default:
       this.evaluate = function (y, yhat) {return 1/2 * Math.pow((y - yhat), 2)};
