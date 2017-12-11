@@ -39,7 +39,7 @@ module.exports = function () {
     (typeof probability !== 'number') ? probability = 1 : null;
     (typeof delta !== 'number') ? delta = 0.05 : null;
 
-    seed = new Seeder().from(seed);
+    seed = Seeder.from(seed);
 
     for (var i = 0; i < this.backconnections.length; i++) {
       if (this.backconnections[i].frozen === false) {
@@ -112,7 +112,7 @@ module.exports = function () {
 
   this.jumbleTrainRate = function (probability, seed) {
     (typeof probability !== 'number') ? probability = 1 : null;
-    seed = new Seeder().from(seed);
+    seed = Seeder.from(seed);
     for (var i = 0; i < this.backconnections.length; i++) {
       if (seed.add(1).random() <= probability && this.backconnections[i].frozen === false) {
         this.backconnections[i].local_trainrate = Math.random();
@@ -149,7 +149,7 @@ module.exports = function () {
   this.freeze = function (probability, seed) {
     // freezes weights of the neurone
 
-    seed = new Seeder().from(seed);
+    seed = Seeder.from(seed);
 
     var frozen = new Array();
     (typeof probability !== 'number') ? probability = 1 : null;
@@ -166,7 +166,7 @@ module.exports = function () {
   this.unfreeze = function (probability, seed) {
     // freezes weights of the neurone
     var frozen = new Array();
-    seed = new Seeder().from(seed);
+    seed = Seeder.from(seed);
     (typeof probability !== 'number') ? probability = 1 : null;
 
     for (var i = 0; i < this.backconnections.length; i++) {
@@ -258,7 +258,7 @@ module.exports = function () {
   };
 
   this.seedWeights = function (seed) {
-    seed = new Seeder().from(seed);
+    seed = Seeder.from(seed);
 
     for (var i = 0; i < this.backconnections.length; i++) {
       this.backconnections[i].weight !== undefined ? this.backconnections[i].weight = 2 * (seed.add('W').random() - 0.5) : null;
@@ -267,7 +267,7 @@ module.exports = function () {
   };
 
   this.seedBiases = function (seed) {
-    seed = new Seeder().from(seed);
+    seed = Seeder.from(seed);
 
     for (var i = 0; i < this.backconnections.length; i++) {
       if (this.backconnections[i].neurone.type === 'bias') {

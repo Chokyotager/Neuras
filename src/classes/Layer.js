@@ -27,7 +27,7 @@ module.exports = function () {
   };
 
   this.selfconnect = function (probability, seed) {
-    seed = new Seeder().from(seed);
+    seed = Seeder.from(seed);
     this.connect(this, probability, seed.add(1));
     return this;
   };
@@ -62,7 +62,7 @@ module.exports = function () {
       weighted = false;
     };
 
-    seed = new Seeder().from(seed);
+    seed = Seeder.from(seed);
 
     for (var i = 0; i < this.neurones.length; i++) {
       if (seed.add(1).random() <= probability && this.neurones[i] instanceof Neurone) {
@@ -94,7 +94,7 @@ module.exports = function () {
       throw "[Neuras] Probability for dropouts cannot be undefined!";
     };
 
-    seed = new Seeder().from(seed);
+    seed = Seeder.from(seed);
 
     for (var i = 0; i < this.neurones.length; i++) {
       if (seed.add(1).random() <= probability) {
@@ -111,7 +111,7 @@ module.exports = function () {
 
     (typeof probability !== 'number') ? probability = 1 : null;
 
-    seed = new Seeder().from(seed);
+    seed = Seeder.from(seed);
 
     for (var i = 0; i < this.neurones.length; i++) {
       if (seed.add(1).random() <= probability && (this.neurones[i].meta.type === 'neurone' || this.neurones[i].meta.type === 'linkage')) {
@@ -125,7 +125,7 @@ module.exports = function () {
     (typeof probability !== 'number') ? probability = 1 : null;
     (typeof delta !== 'number') ? delta = 0.05 : null;
 
-    seed = new Seeder().from(seed);
+    seed = Seeder.from(seed);
 
     for (var i = 0; i < this.neurones.length; i++) {
       if (seed.add(1).random() <= probability && (this.neurones[i].meta.type === 'neurone' || this.neurones[i].meta.type === 'linkage')) {
@@ -139,7 +139,7 @@ module.exports = function () {
       throw "[Neuras] Probability for dropouts cannot be undefined!";
     };
 
-    seed = new Seeder().from(seed);
+    seed = Seeder.from(seed);
 
     for (var i = 0; i < this.neurones.length; i++) {
       if (seed.add(1).random() <= probability) {
@@ -155,7 +155,7 @@ module.exports = function () {
   this.freezeNeurones = function (probability, seed) {
 
     (typeof probability !== 'number') ? probability = 1 : null;
-    seed = new Seeder().from(seed);
+    seed = Seeder.from(seed);
 
     for (var i = 0; i < this.neurones.length; i++) {
       if (seed.add(1).random() <= probability && this.neurones[i] instanceof Neurone) {
@@ -168,7 +168,7 @@ module.exports = function () {
   this.freezeWeights = function (probability, seed) {
 
     (typeof probability !== 'number') ? probability = 1 : null;
-    seed = new Seeder().from(seed);
+    seed = Seeder.from(seed);
 
     for (var i = 0; i < this.neurones.length; i++) {
       if (this.neurones[i] instanceof Neurone) {
@@ -181,7 +181,7 @@ module.exports = function () {
   this.unfreezeNeurones = function  (probability, seed) {
 
     (typeof probability !== 'number') ? probability = 1 : null;
-    seed = new Seeder().from(seed);
+    seed = Seeder.from(seed);
 
     for (var i = 0; i < this.neurones.length; i++) {
       if (seed.add(1).random() <= probability) {
@@ -196,7 +196,7 @@ module.exports = function () {
   this.unfreezeWeights = function  (probability, seed) {
 
     (typeof probability !== 'number') ? probability = 1 : null;
-    seed = new Seeder().from(seed);
+    seed = Seeder.from(seed);
 
     for (var i = 0; i < this.neurones.length; i++) {
       if (this.neurones[i] instanceof Neurone) {
@@ -233,7 +233,7 @@ module.exports = function () {
       probability = 1;
     };
 
-    seed = new Seeder().from(seed);
+    seed = Seeder.from(seed);
 
     for (var i = 0; i < this.neurones.length; i++) {
       for (var j = 0; j < layer.neurones.length; j++) {
@@ -267,7 +267,7 @@ module.exports = function () {
       probability = 1;
     };
 
-    seed = new Seeder().from(seed);
+    seed = Seeder.from(seed);
 
     var potential_connections = Math.min(this.neurones.length, layer.neurones.length);
 
@@ -328,7 +328,7 @@ module.exports = function () {
   };
 
   this.seed = function (seed) {
-    seed = new Seeder().from(seed);
+    seed = Seeder.from(seed);
     for (var i = 0; i < this.neurones.length; i++) {
       if (this.neurones[i].meta.type !== 'gate' && this.neurones[i].meta.type !== 'buffer') {
         this.neurones[i].seed(seed.add(3));
