@@ -80,14 +80,19 @@ module.exports = function (linkage, json) {
       };
       var out = this.linkage.forward(inputs[i]);
 
-      for (var j = 0; j < inputs[i].length; j++) {
-        derivatives.push(this.derivative(outputs[i][j], out[j]));
-        losses.push(this.evaluate(outputs[i][j], out[j]));
+      var deriv_placeholder = new Array();
+      var loss_placeholder = new Array();
+
+      for (var j = 0; j < outputs[i].length; j++) {
+        deriv_placeholder.push(this.derivative(outputs[i][j], out[j]));
+        loss_placeholder.push(this.evaluate(outputs[i][j], out[j]));
       };
+      derivatives.push(deriv_placeholder);
+      losses.push(loss_placeholder);
     };
 
-    var deriv = new Array(derivatives.length).fill(0);
-    var loss = new Array(derivatives.length).fill(0);
+    var deriv = new Array(outputs[0].length).fill(0);
+    var loss = new Array(outputs[0].length).fill(0);
 
     for (var i = 0; i < derivatives.length; i++) {
       for (var j = 0; j < derivatives[i].length; j++) {
@@ -96,16 +101,20 @@ module.exports = function (linkage, json) {
       };
     };
 
-    deriv = this.optimiser.optimise(derivatives);
+    deriv = this.optimiser.optimise(deriv);
 
-    // Capping & rate multiplication
-    for (var i = 0; i < deriv.length; i++) {
-      deriv[i] = Math.max(Math.min(deriv[i] * rate, this.gradient_clip), -this.gradient_clip);
-    };
+    if (deriv.length > 0) {
+      // Capping & rate multiplication
+      for (var i = 0; i < deriv.length; i++) {
+        deriv[i] = Math.max(Math.min(deriv[i] * rate, this.gradient_clip), -this.gradient_clip);
+      };
 
-    this.linkage.backpropagate(deriv);
+      this.linkage.backpropagate(deriv);
 
-    return loss;
+      return loss;
+    } else {
+      return new Array(outputs.length).fill(null);
+    }
 
   };
 
