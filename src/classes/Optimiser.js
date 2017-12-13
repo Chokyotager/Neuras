@@ -80,6 +80,34 @@ module.exports = function (optimiser, properties) {
       };
       break;
 
+      case 'adagamma':
+        this.type = 'adagamma';
+
+        if (this.options === undefined || typeof this.options.momentum !== 'number') {
+          throw "[Neuras] Momentum property in Optimiser should be defined!";
+        };
+
+        this.optimisation = function (m) {
+          var n = new Array();
+          var p = new Array();
+
+          if (this.cache.prev === m) {
+            this.cache.prev = new Array(m.length).fill(0);
+          };
+
+          for (var i = 0; i < m.length; i++) {
+            // power 2 gets rid of negatives in gradient
+            var jx = Math.pow(m[i], 2) + this.options.momentum * this.cache.prev[i];
+            var numerator = this.cache.prev[i];
+            var denominator = Math.sqrt(jx + 10e-30);
+            p.push(m[i] - this.options.momentum * numerator/denominator * m[i]);
+            n.push(jx);
+          };
+          this.cache.prev = n;
+          return p;
+        };
+        break;
+
     case "none":
       this.type = 'none';
       this.optimisation = function (m) {
