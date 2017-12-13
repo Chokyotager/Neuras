@@ -71,35 +71,41 @@ module.exports = function (linkage, json) {
 
     typeof probability !== 'number' ? probability = 1 : null;
 
-    var count = 0;
-    var derivatives = new Array(inputs[0].length).fill(0);
-    var losses = new Array(inputs[0].length).fill(0);
+    var derivatives = new Array();
+    var losses = new Array();
 
     for (var i = 0; i < inputs.length; i++) {
       if (Math.random() > probability) {
         continue;
       };
-      count++
       var out = this.linkage.forward(inputs[i]);
 
       for (var j = 0; j < inputs[i].length; j++) {
-        derivatives[j] += this.derivative(outputs[i][j], out[j]);
-        losses[j] += this.evaluate(outputs[i][j], out[j]);
+        derivatives.push(this.derivative(outputs[i][j], out[j]));
+        losses.push(this.evaluate(outputs[i][j], out[j]));
       };
     };
 
-    if (count > 0) {
+    var deriv = new Array(derivatives.length).fill(0);
+    var loss = new Array(derivatives.length).fill(0);
 
-      for (var i = 0; i < derivatives.length; i++) {
-        derivatives[i] = derivatives[i] / count;
-        losses[i] /= count;
+    for (var i = 0; i < derivatives.length; i++) {
+      for (var j = 0; j < derivatives[i].length; j++) {
+        deriv[j] += derivatives[i][j] * 1/derivatives.length;
+        loss[j] += losses[i][j] * 1/derivatives.length;
       };
-
-      deriv = this.optimiser.optimise(derivatives);
-      this.linkage.backpropagate(deriv);
     };
 
-    return losses;
+    deriv = this.optimiser.optimise(derivatives);
+
+    // Capping & rate multiplication
+    for (var i = 0; i < deriv.length; i++) {
+      deriv[i] = Math.max(Math.min(deriv[i] * rate, this.gradient_clip), -this.gradient_clip);
+    };
+
+    this.linkage.backpropagate(deriv);
+
+    return loss;
 
   };
 
@@ -126,14 +132,14 @@ module.exports = function (linkage, json) {
 
     for (var i = 0; i < expected.length; i++) {
       losses.push(this.evaluate(expected[i], output[i]));
-      derivatives.push(this.derivative(expected[i], output[i]) * rate);
+      derivatives.push(this.derivative(expected[i], output[i]));
     };
 
     var updated_derivatives = this.optimiser.optimise(derivatives);
 
-    // Capping
+    // Capping & rate multiplication
     for (var i = 0; i < updated_derivatives.length; i++) {
-      updated_derivatives[i] = Math.max(Math.min(updated_derivatives[i], this.gradient_clip), -this.gradient_clip);
+      updated_derivatives[i] = Math.max(Math.min(updated_derivatives[i] * rate, this.gradient_clip), -this.gradient_clip);
     };
 
     this.linkage.backpropagate(updated_derivatives);
