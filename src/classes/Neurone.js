@@ -114,7 +114,7 @@ module.exports = function () {
     (typeof probability !== 'number') ? probability = 1 : null;
     seed = Seeder.from(seed);
     for (var i = 0; i < this.backconnections.length; i++) {
-      if (seed.add(1).random() <= probability && this.backconnections[i].frozen === false) {
+      if (seed.add(1).random() < probability && this.backconnections[i].frozen === false) {
         this.backconnections[i].local_trainrate = Math.random();
       };
     };
@@ -155,7 +155,7 @@ module.exports = function () {
     (typeof probability !== 'number') ? probability = 1 : null;
 
     for (var i = 0; i < this.backconnections.length; i++) {
-      if (seed.add(1).random() <= probability && this.backconnections[i].weight !== undefined && this.backconnections[i].frozen == false) {
+      if (seed.add(1).random() < probability && this.backconnections[i].weight !== undefined && this.backconnections[i].frozen == false) {
         this.backconnections[i].frozen = true;
         frozen.push(this.backconnections[i]);
       };
@@ -170,7 +170,7 @@ module.exports = function () {
     (typeof probability !== 'number') ? probability = 1 : null;
 
     for (var i = 0; i < this.backconnections.length; i++) {
-      if (seed.add(1).random() <= probability && this.backconnections[i].weight !== undefined && this.backconnections[i].frozen == true) {
+      if (seed.add(1).random() < probability && this.backconnections[i].weight !== undefined && this.backconnections[i].frozen == true) {
         this.backconnections[i].frozen = false;
         frozen.push(this.backconnections[i]);
       };
@@ -222,7 +222,7 @@ module.exports = function () {
 
     var drops = new Array();
     for (var i = 0; i < this.backconnections.length; i++) {
-      if (Math.random() <= probability) {
+      if (Math.random() < probability) {
         drops.push(this.backconnections[i]);
         this.backconnections[i].dropout = !this.backconnections[i].dropout;
       };

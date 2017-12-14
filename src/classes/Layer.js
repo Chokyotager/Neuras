@@ -65,7 +65,7 @@ module.exports = function () {
     seed = Seeder.from(seed);
 
     for (var i = 0; i < this.neurones.length; i++) {
-      if (seed.add(1).random() <= probability && this.neurones[i] instanceof Neurone) {
+      if (seed.add(1).random() < probability && this.neurones[i] instanceof Neurone) {
         this.neurones[i].addBias(weighted, bias);
       };
     };
@@ -97,7 +97,7 @@ module.exports = function () {
     seed = Seeder.from(seed);
 
     for (var i = 0; i < this.neurones.length; i++) {
-      if (seed.add(1).random() <= probability) {
+      if (seed.add(1).random() < probability) {
         if (this.neurones[i].meta.type === 'neurone') {
           this.neurones[i].dropout(1);
         } else if (this.neurones[i].meta.type === 'linkage') {
@@ -114,7 +114,7 @@ module.exports = function () {
     seed = Seeder.from(seed);
 
     for (var i = 0; i < this.neurones.length; i++) {
-      if (seed.add(1).random() <= probability && (this.neurones[i].meta.type === 'neurone' || this.neurones[i].meta.type === 'linkage')) {
+      if (seed.add(1).random() < probability && (this.neurones[i].meta.type === 'neurone' || this.neurones[i].meta.type === 'linkage')) {
         this.neurones[i].jumbleTrainRate(probability, seed);
       };
     };
@@ -128,7 +128,7 @@ module.exports = function () {
     seed = Seeder.from(seed);
 
     for (var i = 0; i < this.neurones.length; i++) {
-      if (seed.add(1).random() <= probability && (this.neurones[i].meta.type === 'neurone' || this.neurones[i].meta.type === 'linkage')) {
+      if (seed.add(1).random() < probability && (this.neurones[i].meta.type === 'neurone' || this.neurones[i].meta.type === 'linkage')) {
         this.neurones[i].messUpWeights(probability, delta, seed);
       };
     };
@@ -142,7 +142,7 @@ module.exports = function () {
     seed = Seeder.from(seed);
 
     for (var i = 0; i < this.neurones.length; i++) {
-      if (seed.add(1).random() <= probability) {
+      if (seed.add(1).random() < probability) {
         if (this.neurones[i].meta.type === 'neurone') {
           this.neurones[i].dropout(probability, seed.add(1));
         } else if (this.neurones[i].meta.type === 'linkage') {
@@ -158,7 +158,7 @@ module.exports = function () {
     seed = Seeder.from(seed);
 
     for (var i = 0; i < this.neurones.length; i++) {
-      if (seed.add(1).random() <= probability && this.neurones[i] instanceof Neurone) {
+      if (seed.add(1).random() < probability && this.neurones[i] instanceof Neurone) {
         this.neurones[i].freeze();
       };
     };
@@ -184,7 +184,7 @@ module.exports = function () {
     seed = Seeder.from(seed);
 
     for (var i = 0; i < this.neurones.length; i++) {
-      if (seed.add(1).random() <= probability) {
+      if (seed.add(1).random() < probability) {
         if (this.neurones[i] instanceof Neurone) {
           this.neurones[i].unfreeze();
         };
@@ -237,7 +237,7 @@ module.exports = function () {
 
     for (var i = 0; i < this.neurones.length; i++) {
       for (var j = 0; j < layer.neurones.length; j++) {
-        if (seed.add(1).random() <= probability) {
+        if (seed.add(1).random() < probability) {
           if (layer.neurones[j].meta.type === 'linkage') {
             this.connect(layer.neurones[j].chronology[0]);
           } else {
@@ -272,7 +272,7 @@ module.exports = function () {
     var potential_connections = Math.min(this.neurones.length, layer.neurones.length);
 
     for (var i = 0; i < potential_connections; i++) {
-      if (seed.add(1).random() <= probability) {
+      if (seed.add(1).random() < probability) {
         this.neurones[i].connect(layer.neurones[i], seed);
       };
     };
