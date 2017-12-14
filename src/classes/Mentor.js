@@ -63,58 +63,66 @@ module.exports = function (linkage, json) {
     return this;
   };
 
-  this.trainStochastically = function (inputs, outputs, rate, probability) {
-
+  this.batchTrain = function (inputs, outputs, rate, batch) {
     if (inputs.length !== outputs.length) {
-      throw "[Neuras] Input array should be of the same length as output array!";
+      throw "[Neuras] Number of inputs should be the same as outputs";
     };
 
-    typeof probability !== 'number' ? probability = 1 : null;
+    if (typeof batch !== 'number' || batch < 0) {
+      throw "[Neuras] Batch count should be specified!";
+    };
 
-    var derivatives = new Array();
-    var losses = new Array();
+    var train_count = inputs.length;
 
-    for (var i = 0; i < inputs.length; i++) {
-      if (Math.random() > probability) {
-        continue;
+    batch = Math.ceil((batch < 1) ? batch * train_count : batch);
+
+    var out_count = this.linkage.configuration[this.linkage.chronology.length - 1][1];
+    var accumula = new Array(out_count).fill(0);
+
+    for (var i = 0; i < train_count; i += batch) {
+      var ix = inputs.slice(i, i + batch);
+      var iy = outputs.slice(i, i + batch);
+
+      var out = this.stochasticTrain(ix, iy, rate);
+      for (var j = 0; j < out.length; j++) {
+        accumula[j] += out[j] * ix.length/train_count;
       };
+    };
+
+    return accumula;
+
+  };
+
+  this.stochasticTrain = function (inputs, outputs, rate) {
+    if (inputs.length !== outputs.length) {
+      throw "[Neuras] Number of inputs should be the same as outputs";
+    };
+
+    var train_count = inputs.length;
+    var out_count = this.linkage.configuration[this.linkage.chronology.length - 1][1];
+    var derivatives = new Array(out_count).fill(0);
+    var losses = new Array(out_count).fill(0);
+
+    var ratio = 1/outputs.length;
+
+    for (var i = 0; i < train_count; i++) {
       var out = this.linkage.forward(inputs[i]);
-
-      var deriv_placeholder = new Array();
-      var loss_placeholder = new Array();
-
-      for (var j = 0; j < outputs[i].length; j++) {
-        deriv_placeholder.push(this.derivative(outputs[i][j], out[j]));
-        loss_placeholder.push(this.evaluate(outputs[i][j], out[j]));
-      };
-      derivatives.push(deriv_placeholder);
-      losses.push(loss_placeholder);
-    };
-
-    var deriv = new Array(outputs[0].length).fill(0);
-    var loss = new Array(outputs[0].length).fill(0);
-
-    for (var i = 0; i < derivatives.length; i++) {
-      for (var j = 0; j < derivatives[i].length; j++) {
-        deriv[j] += derivatives[i][j] * 1/derivatives.length;
-        loss[j] += losses[i][j] * 1/derivatives.length;
+      for (var j = 0; j < out_count; j++) {
+        losses[j] += this.evaluate(outputs[i][j], out[j]) * ratio;
+        derivatives[j] += this.derivative(outputs[i][j], out[j]) * ratio;
       };
     };
 
-    deriv = this.optimiser.optimise(deriv);
+    var updated_derivatives = this.optimiser.optimise(derivatives);
 
-    if (deriv.length > 0) {
-      // Capping & rate multiplication
-      for (var i = 0; i < deriv.length; i++) {
-        deriv[i] = Math.max(Math.min(deriv[i] * rate, this.gradient_clip), -this.gradient_clip);
-      };
+    // Capping & rate multiplication
+    for (var i = 0; i < updated_derivatives.length; i++) {
+      updated_derivatives[i] = Math.max(Math.min(updated_derivatives[i] * rate, this.gradient_clip), -this.gradient_clip);
+    };
 
-      this.linkage.backpropagate(deriv);
+    this.linkage.backpropagate(updated_derivatives);
 
-      return loss;
-    } else {
-      return new Array(outputs.length).fill(null);
-    }
+    return losses;
 
   };
 
