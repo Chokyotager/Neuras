@@ -12,49 +12,49 @@ module.exports = function (linkage, json) {
   switch (json.lossFunction) {
     case "mean-squared":
       this.loss_function = "mean-squared";
-      prototype.evaluate= function (y, yhat) {return 1/2 * Math.pow((y - yhat), 2)};
+      prototype.evaluate = function (y, yhat) {return 1/2 * Math.pow((y - yhat), 2)};
       prototype.derivative = function (y, yhat) {return -(y - yhat)};
       break;
 
     case "cross-entropy":
       this.loss_function = "cross-entropy";
-      prototype.evaluate= function (y, yhat) {return -y * Math.log(yhat + 10e-30)};
+      prototype.evaluate = function (y, yhat) {return -y * Math.log(yhat + 10e-30)};
       prototype.derivative = function (y, yhat) {return (yhat - y)};
       break;
 
     case "linear":
       this.loss_function = "linear (experimental)";
-      prototype.evaluate= function (y, yhat) {return y - yhat};
+      prototype.evaluate = function (y, yhat) {return y - yhat};
       prototype.derivative = function (y, yhat) {return -1};
       break;
 
     case "mean-cubed":
       this.loss_function = "mean-cubed (experimental)";
-      prototype.evaluate= function (y, yhat) {return 1/3 * Math.pow((y - yhat), 3)};
+      prototype.evaluate = function (y, yhat) {return 1/3 * Math.pow((y - yhat), 3)};
       prototype.derivative = function (y, yhat) {return -Math.pow((y - yhat), 2)};
       break;
 
     case "mean-quad":
       this.loss_function = "mean-quad";
-      prototype.evaluate= function (y, yhat) {return 1/4 * Math.pow((y - yhat), 4)};
+      prototype.evaluate = function (y, yhat) {return 1/4 * Math.pow((y - yhat), 4)};
       prototype.derivative = function (y, yhat) {return -Math.pow((y - yhat), 3)};
       break;
 
     case "abs":
       this.loss_function = "abs (experimental)";
-      prototype.evaluate= function (y, yhat) {return Math.abs(y - yhat)};
+      prototype.evaluate = function (y, yhat) {return Math.abs(y - yhat)};
       prototype.derivative = function (y, yhat) {return (y-yhat) !== 0 ? -(y-yhat)/Math.abs(y-yhat) : 0};
       break;
 
     case "log-cosh":
       this.loss_function = "log-cosh";
-      prototype.evaluate= function (y, yhat) {return Math.log(Math.cosh(y - yhat))};
+      prototype.evaluate = function (y, yhat) {return Math.log(Math.cosh(y - yhat))};
       prototype.derivative = function (y, yhat) {return -(Math.log(Math.E) * Math.sinh(y - yhat))/Math.cosh(y - yhat)};
       break;
 
     default:
       this.loss_function = "mean-squared";
-      prototype.evaluate= function (y, yhat) {return 1/2 * Math.pow((y - yhat), 2)};
+      prototype.evaluate = function (y, yhat) {return 1/2 * Math.pow((y - yhat), 2)};
       prototype.derivative = function (y, yhat) {return -(y - yhat)};
       break;
   };
