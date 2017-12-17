@@ -5,18 +5,22 @@ var NMatrix = require('./NeuroneMatrix');
 //var Input = require('./Input');
 
 module.exports = function () {
+
+  var prototype = module.exports.prototype;
+
   this.squash = new Squash('tanh');
   this.uuid = uuid();
   this.backconnections = new Array();
   this.biases = 0;
-  this.cache = new Object();
-  this.value = 0;
 
-  this.meta = new Object();
+  prototype.value = 0;
+  prototype.cache = new Object();
+  prototype.meta = new Object();
+  prototype.chain_derivative = 0;
   this.meta.weighted = true;
   this.meta.type = 'neurone';
 
-  this.matrix = {
+  module.exports.prototype.matrix = {
     miu: function (m) { return m.reduce(function (a, b) {return a + b;})},
     // partial derivative = 1 w.r.t. factor
     miu_prime: function (m) {return 1},
@@ -103,9 +107,9 @@ prototype.forward = function (x) {
 
   var output = this.squash.forward(x);
 
-  this.cache.miu = x;
-  this.cache.matrix = matrix;
-  this.chain_derivative = 0;
+  prototype.cache.miu = x;
+  prototype.cache.matrix = matrix;
+  prototype.chain_derivative = 0;
 
   this.value = output;
 
@@ -183,19 +187,16 @@ prototype.unfreeze = function (probability, seed) {
 };
 
 prototype.getUnsquashedOutput = function () {
-  return this.cache.miu;
+  return prototype.cache.miu;
 };
 
 prototype.backpropagate = function (additiveRate) {
 
-  if (this.chain_derivative === undefined) {
-    throw "[Neuras] Neurone class should have been forwarded prior to backpropagation!";
-  };
   if (typeof additiveRate !== 'number') {
     additiveRate = 1;
   };
   // backpropagate derivative
-  var derivative = this.chain_derivative * this.derivative * additiveRate;
+  var derivative = prototype.chain_derivative * this.derivative * additiveRate;
   for (var i = 0; i < this.backconnections.length; i++) {
     // additive rate is multiplied to the current derivative to alter the training rate of the current neurone;
     // it does not affect the neurones further back the line
@@ -206,10 +207,10 @@ prototype.backpropagate = function (additiveRate) {
       };
 
       //update previous derivatives
-      this.backconnections[i].neurone.chain_derivative += derivative * this.backconnections[i].weight * this.backconnections[i].local_trainrate; //this.squash.derivative(this.cache.miu) * this.chain_derivative * this.backconnections[i].weight;
+      this.backconnections[i].neurone.chain_derivative += derivative * this.backconnections[i].weight * this.backconnections[i].local_trainrate; //this.squash.derivative(prototype.cache.miu) * prototype.chain_derivative * this.backconnections[i].weight;
     };
   };
-  this.chain_derivative = 0;
+  prototype.chain_derivative = 0;
   return this;
 };
 
@@ -291,7 +292,7 @@ prototype.seed = function (seed) {
 };
 
 prototype.setDerivativeChain = function (x) {
-  this.chain_derivative = x;
+  prototype.chain_derivative = x;
   return this;
 };
 

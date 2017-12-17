@@ -3,9 +3,11 @@
 
 module.exports = function () {
 
+  var prototype = module.exports.prototype;
+
   this.connections = new Array();
 
-  this.meta = new Object();
+  prototype.meta = new Object();
   this.meta.type = 'buffer';
   this.meta.weighted = false;
   this.meta.max_connections = Infinity;

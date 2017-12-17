@@ -4,13 +4,15 @@ var Seeder = require('./Seeder');
 module.exports = function (chronology, autolink) {
   // chronology == layers to forward in order
 
+  var prototype = module.exports.prototype;
+
   if (autolink == true) {
     for (var i = 0; i < chronology.length - 1; i++) {
       chronology[i].connect(chronology[i + 1]);
     };
   };
 
-  this.meta = new Object();
+  prototype.meta = new Object();
   this.meta.type = 'linkage';
   this.meta.weighted = false;
 

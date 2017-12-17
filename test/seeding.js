@@ -7,12 +7,18 @@ var l4 = new neuras.Layer().addNeurones(2, 'identity');
 
 var linkage = new neuras.Linkage([ll, l2, l3, l4], true);
 
+linkage = new neuras.Architecture.GRU([1, 3, 2]);
+
 var mentor = new neuras.Mentor(linkage);
 
 
 for (var i = 0; i < l3.neurones.length; i++) {
   console.log(l3.neurones[i].biases);
 };
+
+console.log(mentor);
+console.log(linkage.forward([3]));
+console.log(linkage.forward([3]));
 
 mentor.train([3], [2, 3], 0.4);
 
