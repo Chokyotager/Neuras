@@ -111,7 +111,7 @@ prototype.forward = function (x) {
   prototype.cache.matrix = matrix;
   prototype.chain_derivative = 0;
 
-  this.value = output;
+  prototype.value = output;
 
   this.derivative = this.squash.derivative(x) * this.matrix.miu_prime();;
 

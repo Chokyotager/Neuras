@@ -43,7 +43,7 @@ module.exports = function (gate, options) {
         };
         prototype.derivative = function (index, m, v) {
           if (index === 0) {
-            return this.value * (1 - this.value);
+            return prototype.value * (1 - prototype.value);
           } else {
             return 0;
           };
@@ -199,7 +199,7 @@ module.exports = function (gate, options) {
 
       case "multiplicative":
         this.type = "multiplicative";
-        this.value = 1;
+        prototype.value = 1;
         prototype.operation = function (m) {return m.reduce(function (a, b) {return a * b})};
         prototype.derivative = function (index, m, v) {return v/m[index]};
         break;
@@ -264,7 +264,7 @@ prototype.forward = function () {
   var gateEvaluation = prototype.operation(parse);
   var output = this.squash.forward(gateEvaluation);
   prototype.cache.miu = gateEvaluation;
-  this.value = output;
+  prototype.value = output;
   prototype.cache.matrix = parse;
 
   (typeof prototype.iterative == 'function') ? prototype.iterative() : null;
@@ -277,7 +277,7 @@ prototype.forward = function () {
 prototype.backpropagate = function () {
   // No weights to backpropagate to, so derivatives are just updated instead
   for (var i = 0; i < this.backconnections.length; i++) {
-    var derivative = prototype.chain_derivative * prototype.derivative(i, prototype.cache.matrix, prototype.cache.miu) * this.squash.derivative(this.value);
+    var derivative = prototype.chain_derivative * prototype.derivative(i, prototype.cache.matrix, prototype.cache.miu) * this.squash.derivative(prototype.value);
     this.backconnections[i].neurone.chain_derivative += derivative;
   };
 };

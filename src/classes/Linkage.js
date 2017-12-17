@@ -127,7 +127,7 @@ prototype.backpropagate = function (chain_m) {
       throw "[Neuras] Backpropagation set (length: " + chain_m.length + ") should be equal to number of output/hidden (length: " + this.configuration[this.configuration.length - 1][1] + ") Neurones in last Layer!";
     };
 
-    var n = Array.from(chain_m)
+    var n = Array.from(chain_m);
 
     this.setDerivativeChain('last', 'output', n);
 
