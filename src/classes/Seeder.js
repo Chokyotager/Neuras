@@ -2,22 +2,24 @@ module.exports = function (seed) {
 
   this.seed = seed !== undefined ? seed.toString() : Math.random().toString();
 
-  this.add = function (value) {
-    this.seed += value.toString();
-    return this;
-  };
+};
 
-  this.random = function () {
-    if (typeof this.seed === 'string') {
-      var str = this.seed;
-      var sum = 0;
-      for (var i = 0; i < str.length; i++) {
-        sum += str.charCodeAt(i);
-      };
+var prototype = module.exports.prototype;
+
+prototype.add = function (value) {
+  this.seed += value.toString();
+  return this;
+};
+
+prototype.random = function () {
+  if (typeof this.seed === 'string') {
+    var str = this.seed;
+    var sum = 0;
+    for (var i = 0; i < str.length; i++) {
+      sum += str.charCodeAt(i);
     };
-    return ((sum * 32416190071) % 1300979) / 1300979;
   };
-
+  return ((sum * 32416190071) % 1300979) / 1300979;
 };
 
 module.exports.from = function (val) {

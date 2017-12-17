@@ -14,44 +14,46 @@ module.exports = function () {
 
   Object.freeze(this.meta);
 
-  this.connect = function (unit, weight) {
-    var unweightedInstance = unit.meta.weighted == false;
-    var weightedInstance = unit.meta.weighted == true;
-    if (!unweightedInstance && !weightedInstance) {
-      throw "[Neuras] Inappropriate connection (to) instance.";
-    };
+};
 
-    if (unit.meta.max_connections < unit.backconnections.length + 1) {
-      throw "[Neuras] Unit can only hold " + unit.meta.max_connections + " connection" + ((unit.meta.max_connections > 1) ? "s" : "") + "! Stack-trace to find unit!"
-    };
+var prototype = module.exports.prototype;
 
-    this.connections.push(unit);
-
-    if (unit.meta.max_connections !== undefined) {
-      this.meta.max_connections = Math.min(unit.meta.max_connections, this.meta.max_connections);
-    };
-
-    return this;
-
+prototype.connect = function (unit, weight) {
+  var unweightedInstance = unit.meta.weighted == false;
+  var weightedInstance = unit.meta.weighted == true;
+  if (!unweightedInstance && !weightedInstance) {
+    throw "[Neuras] Inappropriate connection (to) instance.";
   };
 
-  this.disconnectDuplicates = function () {
-    for (var i = 0; i < this.backconnections.length - 1; i++) {
-      for (var j = this.backconnections.length - 1; j > i; j--) {
-        if (this.backconnections[j].neurone === this.backconnections[i].neurone) {
-          this.backconnections.splice(j, 1);
-        };
+  if (unit.meta.max_connections < unit.backconnections.length + 1) {
+    throw "[Neuras] Unit can only hold " + unit.meta.max_connections + " connection" + ((unit.meta.max_connections > 1) ? "s" : "") + "! Stack-trace to find unit!"
+  };
+
+  this.connections.push(unit);
+
+  if (unit.meta.max_connections !== undefined) {
+    this.meta.max_connections = Math.min(unit.meta.max_connections, this.meta.max_connections);
+  };
+
+  return this;
+
+};
+
+prototype.disconnectDuplicates = function () {
+  for (var i = 0; i < this.backconnections.length - 1; i++) {
+    for (var j = this.backconnections.length - 1; j > i; j--) {
+      if (this.backconnections[j].neurone === this.backconnections[i].neurone) {
+        this.backconnections.splice(j, 1);
       };
     };
-    return this;
   };
+  return this;
+};
 
-  this.forward = function () {
-    return new Array();
-  };
+prototype.forward = function () {
+  return new Array();
+};
 
-  this.backpropagate = function () {
-    return null;
-  };
-
+prototype.backpropagate = function () {
+  return null;
 };

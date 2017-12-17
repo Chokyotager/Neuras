@@ -35,220 +35,221 @@ module.exports = function (chronology, autolink) {
     };
     this.configuration.push(layerconf);
   };
+};
 
-  this.forward = function (m) {
+var prototype = module.exports.prototype;
 
-    if (m === undefined) {
-      this.chronology[0].forward();
-    } else {
-      this.chronology[0].forward(m);
-    };
+prototype.forward = function (m) {
 
-    // forward hidden
-    for (var i = 1; i < this.chronology.length; i++) {
-      var latest = this.chronology[i].forward();
-    };
-    return latest;
+  if (m === undefined) {
+    this.chronology[0].forward();
+  } else {
+    this.chronology[0].forward(m);
   };
 
-  this.passivelyForward = function (m) {
-    return this.clone().forward(m);
+  // forward hidden
+  for (var i = 1; i < this.chronology.length; i++) {
+    var latest = this.chronology[i].forward();
+  };
+  return latest;
+};
+
+prototype.passivelyForward = function (m) {
+  return this.clone().forward(m);
+};
+
+prototype.merge = function (linkage, connect) {
+  if (!(linkage instanceof module.exports)) {
+    throw "[Neuras] Can only merge to Linkage classes!";
   };
 
-  this.merge = function (linkage, connect) {
-    if (!(linkage instanceof module.exports)) {
-      throw "[Neuras] Can only merge to Linkage classes!";
-    };
-
-    if (connect) {
-      this.connect(linkage);
-    };
-
-    this.chronology = this.chronology.concat(linkage.chronology);
-    this.configuration = this.configuration.concat(linkage.configuration);
-    return this;
+  if (connect) {
+    this.connect(linkage);
   };
 
-  this.clone = function () {
-    return Object.assign(Object.create(Object.getPrototypeOf(this)), this);
+  this.chronology = this.chronology.concat(linkage.chronology);
+  this.configuration = this.configuration.concat(linkage.configuration);
+  return this;
+};
+
+prototype.clone = function () {
+  return Object.assign(Object.create(Object.getPrototypeOf(this)), this);
+};
+
+prototype.jumbleTrainRate = function (probability, seed) {
+  (typeof probability !== 'number') ? probability = 1 : null;
+
+  seed = Seeder.from(seed);
+
+  for (var i = 0; i < chronology.length; i++) {
+    chronology[i].jumbleTrainRate(probability, seed.add(1));
   };
+};
 
-  this.jumbleTrainRate = function (probability, seed) {
-    (typeof probability !== 'number') ? probability = 1 : null;
+prototype.messUpWeights = function (probability, delta, seed) {
+  (typeof probability !== 'number') ? probability = 1 : null;
+  (typeof delta !== 'number') ? delta = 0.05 : null;
 
-    seed = Seeder.from(seed);
+  seed = Seeder.from(seed);
 
-    for (var i = 0; i < chronology.length; i++) {
-      chronology[i].jumbleTrainRate(probability, seed.add(1));
-    };
+  for (var i = 0; i < chronology.length; i++) {
+    chronology[i].messUpWeights(probability, delta, seed.add(1));
   };
+};
 
-  this.messUpWeights = function (probability, delta, seed) {
-    (typeof probability !== 'number') ? probability = 1 : null;
-    (typeof delta !== 'number') ? delta = 0.05 : null;
-
-    seed = Seeder.from(seed);
-
-    for (var i = 0; i < chronology.length; i++) {
-      chronology[i].messUpWeights(probability, delta, seed.add(1));
-    };
+prototype.lock = function () {
+  for (var i = 0; i < this.chronology.length; i++) {
+    this.chronology[i].lock();
   };
+  return this;
+};
 
-  this.lock = function () {
-    for (var i = 0; i < this.chronology.length; i++) {
-      this.chronology[i].lock();
-    };
-    return this;
+prototype.unlock = function () {
+  for (var i = 0; i < this.chronology.length; i++) {
+    this.chronology[i].unlock();
   };
+  return this;
+};
 
-  this.unlock = function () {
-    for (var i = 0; i < this.chronology.length; i++) {
-      this.chronology[i].unlock();
-    };
-    return this;
-  };
+prototype.toLayer = function () {
+  return new Layer().addLinkage(this);
+};
 
-  this.toLayer = function () {
-    return new Layer().addLinkage(this);
-  };
+prototype.backpropagate = function (chain_m) {
+  // backpropagate output neurones
+  //console.log(this.chronology[this.chronology.length - 1])
 
-  this.backpropagate = function (chain_m) {
-    // backpropagate output neurones
-    //console.log(this.chronology[this.chronology.length - 1])
-
-    if (chain_m !== undefined) {
-      //console.log(this.configuration)
-      if (chain_m.length !== this.configuration[this.configuration.length - 1][1]) {
-        throw "[Neuras] Backpropagation set (length: " + chain_m.length + ") should be equal to number of output/hidden (length: " + this.configuration[this.configuration.length - 1][1] + ") Neurones in last Layer!";
-      };
-
-      var n = Array.from(chain_m)
-
-      this.setDerivativeChain('last', 'output', n);
-
-    };
-
-    for (var i = this.chronology.length - 1; i >= 0; i--) {
-      this.chronology[i].backpropagate();
+  if (chain_m !== undefined) {
+    //console.log(this.configuration)
+    if (chain_m.length !== this.configuration[this.configuration.length - 1][1]) {
+      throw "[Neuras] Backpropagation set (length: " + chain_m.length + ") should be equal to number of output/hidden (length: " + this.configuration[this.configuration.length - 1][1] + ") Neurones in last Layer!";
     };
 
-    return this;
+    var n = Array.from(chain_m)
+
+    this.setDerivativeChain('last', 'output', n);
 
   };
 
-  this.connect = function (unit, probability, seed) {
-
-    if (typeof probability !== 'number') {
-      probability = 1;
-    };
-
-    seed = Seeder.from(seed);
-
-    var output = this.chronology[this.chronology.length - 1];
-
-    for (var i = 0; i < output.neurones.length; i++) {
-      if (seed.add(1).random() < probability) {
-        if (unit.meta.type == 'linkage') {
-          output.connect(unit.chronology[0]);
-        } else {
-          output.neurones[i].connect(unit);
-        };
-      };
-    };
-    return unit;
+  for (var i = this.chronology.length - 1; i >= 0; i--) {
+    this.chronology[i].backpropagate();
   };
 
-  this.disconnectDuplicates = function () {
-    this.chronology[0].disconnectDuplicates();
-    return this;
+  return this;
+
+};
+
+prototype.connect = function (unit, probability, seed) {
+
+  if (typeof probability !== 'number') {
+    probability = 1;
   };
 
-  this.getUnsquashedOutput = function () {
-    var last_layer = this.chronology[this.chronology.length - 1];
-    return last_layer.getUnsquashedOutput();
-  };
+  seed = Seeder.from(seed);
 
-  this.dropoutNeurones = function (probability, seed) {
+  var output = this.chronology[this.chronology.length - 1];
 
-    if (typeof probability !== 'number') {
-      throw "[Neuras] Probability for dropouts cannot be undefined!";
-    };
-
-    seed = Seeder.from(seed);
-
-    for (var i = 0; i < this.chronology.length; i++) {
-      this.chronology[i].dropoutNeurones(probability, seed.add(1));
-    };
-
-  };
-
-  this.dropoutWeights = function (probability, seed) {
-
-    if (typeof probability !== 'number') {
-      throw "[Neuras] Probability for dropouts cannot be undefined!";
-    };
-
-    seed = Seeder.from(seed);
-
-    for (var i = 0; i < this.chronology.length; i++) {
-      this.chronology[i].dropoutWeights(probability, seed.add(1));
-    };
-
-  };
-
-  this.seed = function (seed) {
-
-    seed = Seeder.from(seed);
-
-    for (var i = 0; i < this.chronology.length; i++) {
-      this.chronology[i].seed(seed.add('2'));
-    };
-    return this;
-  };
-
-  this.setDerivativeChain = function (type, layer, chain_m) {
-
-    if (typeof layer !== 'number') {
-      switch (layer) {
-      case "last":
-        layer = this.chronology.length - 1;
-        break;
-
-      case "first":
-        layer = 0;
-        break;
-
-      default:
-        layer = this.chronology.length - 1;
-        break;
+  for (var i = 0; i < output.neurones.length; i++) {
+    if (seed.add(1).random() < probability) {
+      if (unit.meta.type == 'linkage') {
+        output.connect(unit.chronology[0]);
+      } else {
+        output.neurones[i].connect(unit);
       };
     };
+  };
+  return unit;
+};
 
-    switch (type) {
-      case "input":
-        type = 0;
-        break;
+prototype.disconnectDuplicates = function () {
+  this.chronology[0].disconnectDuplicates();
+  return this;
+};
 
-      case "output":
-        type = "last";
-        break;
+prototype.getUnsquashedOutput = function () {
+  var last_layer = this.chronology[this.chronology.length - 1];
+  return last_layer.getUnsquashedOutput();
+};
 
-      default:
-        type = "last";
-        break;
-    };
+prototype.dropoutNeurones = function (probability, seed) {
 
-    var res = new Array();
-    for (var i = 0; i < this.chronology[layer].neurones.length; i++) {
-        if (this.chronology[layer].neurones[i].meta.type == "linkage") {
-          this.chronology[layer].neurones[i].setDerivativeChain(type, 'last', chain_m);
-        } else {
-          this.chronology[layer].neurones[i].setDerivativeChain(chain_m[0]);
-          chain_m.shift();
-        };
-
-    };
-    return res;
+  if (typeof probability !== 'number') {
+    throw "[Neuras] Probability for dropouts cannot be undefined!";
   };
 
+  seed = Seeder.from(seed);
+
+  for (var i = 0; i < this.chronology.length; i++) {
+    this.chronology[i].dropoutNeurones(probability, seed.add(1));
+  };
+
+};
+
+prototype.dropoutWeights = function (probability, seed) {
+
+  if (typeof probability !== 'number') {
+    throw "[Neuras] Probability for dropouts cannot be undefined!";
+  };
+
+  seed = Seeder.from(seed);
+
+  for (var i = 0; i < this.chronology.length; i++) {
+    this.chronology[i].dropoutWeights(probability, seed.add(1));
+  };
+
+};
+
+prototype.seed = function (seed) {
+
+  seed = Seeder.from(seed);
+
+  for (var i = 0; i < this.chronology.length; i++) {
+    this.chronology[i].seed(seed.add('2'));
+  };
+  return this;
+};
+
+prototype.setDerivativeChain = function (type, layer, chain_m) {
+
+  if (typeof layer !== 'number') {
+    switch (layer) {
+    case "last":
+      layer = this.chronology.length - 1;
+      break;
+
+    case "first":
+      layer = 0;
+      break;
+
+    default:
+      layer = this.chronology.length - 1;
+      break;
+    };
+  };
+
+  switch (type) {
+    case "input":
+      type = 0;
+      break;
+
+    case "output":
+      type = "last";
+      break;
+
+    default:
+      type = "last";
+      break;
+  };
+
+  var res = new Array();
+  for (var i = 0; i < this.chronology[layer].neurones.length; i++) {
+      if (this.chronology[layer].neurones[i].meta.type == "linkage") {
+        this.chronology[layer].neurones[i].setDerivativeChain(type, 'last', chain_m);
+      } else {
+        this.chronology[layer].neurones[i].setDerivativeChain(chain_m[0]);
+        chain_m.shift();
+      };
+
+  };
+  return res;
 };

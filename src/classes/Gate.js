@@ -209,117 +209,118 @@ module.exports = function (gate, options) {
 
     };
   };
+};
 
-  this.changeSquash = function (sq, params) {
-    this.squash = new Squash(sq, params);
-    return this;
+var prototype = module.exports.prototype;
+
+prototype.changeSquash = function (sq, params) {
+  this.squash = new Squash(sq, params);
+  return this;
+};
+
+prototype.limitConnections = function (connections) {
+  if (connections < this.backconnections.length) {
+    throw "[Neuras] Cannot lower backconnection limits than already existing number of connections!";
   };
 
-  this.limitConnections = function (connections) {
-    if (connections < this.backconnections.length) {
-      throw "[Neuras] Cannot lower backconnection limits than already existing number of connections!";
+  if (typeof connections !== 'number' || connections < 0) {
+    throw "[Neuras] Invalid limit on connections!";
+  };
+
+  this.meta.max_connections = connections;
+  return this;
+};
+
+prototype.lock = function () {
+  this.meta.max_connections = this.backconnections.length;
+  return this;
+};
+
+prototype.unlock = function () {
+  this.meta.max_connections = Infinity;
+  return this;
+};
+
+prototype.forward = function () {
+  var parse = new Array();
+  for (var i = 0; i < this.backconnections.length; i++) {
+    // No respect to order, but run from top to bottom of Layer anyway
+    // No weights
+
+    // TEMPORARY!!!! NOTE THIS
+    /*if (this.backconnections[i].neurone.value === 0) {
+      var def = 10e-30;
+    } else {
+      var def = this.backconnections[i].neurone.value;
+    };*/
+    parse.push(this.backconnections[i].neurone.value);
+  };
+
+  parse.length == 0 ? parse[0] = 0 : null;
+
+  var gateEvaluation = this.operation(parse);
+  var output = this.squash.forward(gateEvaluation);
+  this.cache.miu = gateEvaluation;
+  this.value = output;
+  this.cache.matrix = parse;
+
+  (typeof this.iterative == 'function') ? this.iterative() : null;
+
+  this.chain_derivative = 0;
+
+  return output;
+};
+
+prototype.backpropagate = function () {
+  // No weights to backpropagate to, so derivatives are just updated instead
+  for (var i = 0; i < this.backconnections.length; i++) {
+    var derivative = this.chain_derivative * this.derivative(i, this.cache.matrix, this.cache.miu) * this.squash.derivative(this.value);
+    this.backconnections[i].neurone.chain_derivative += derivative;
+  };
+};
+
+prototype.setDerivativeChain = function (x) {
+  this.chain_derivative = x;
+  return this;
+};
+
+prototype.connect = function (unit, weight) {
+  var unweightedInstance = unit.meta.weighted == false;
+  var weightedInstance = unit.meta.weighted == true;
+  if (!unweightedInstance && !weightedInstance) {
+    throw "[Neuras] Inappropriate connection (to) instance.";
+  };
+
+  if (unit.meta.max_connections < unit.backconnections.length + 1) {
+    throw "[Neuras] Unit can only hold " + unit.meta.max_connections + " connection" + ((unit.meta.max_connections !== 1) ? "s" : "") + "! Stack-trace to find unit!"
+  };
+
+  if (unit.meta.type === 'buffer') {
+    for (var i = 0; i < unit.connections.length; i++) {
+      this.connect(unit.connections[i], weight);
     };
-
-    if (typeof connections !== 'number' || connections < 0) {
-      throw "[Neuras] Invalid limit on connections!";
-    };
-
-    this.meta.max_connections = connections;
-    return this;
-  };
-
-  this.lock = function () {
-    this.meta.max_connections = this.backconnections.length;
-    return this;
-  };
-
-  this.unlock = function () {
-    this.meta.max_connections = Infinity;
-    return this;
-  };
-
-  this.forward = function () {
-    var parse = new Array();
-    for (var i = 0; i < this.backconnections.length; i++) {
-      // No respect to order, but run from top to bottom of Layer anyway
-      // No weights
-
-      // TEMPORARY!!!! NOTE THIS
-      /*if (this.backconnections[i].neurone.value === 0) {
-        var def = 10e-30;
-      } else {
-        var def = this.backconnections[i].neurone.value;
-      };*/
-      parse.push(this.backconnections[i].neurone.value);
-    };
-
-    parse.length == 0 ? parse[0] = 0 : null;
-
-    var gateEvaluation = this.operation(parse);
-    var output = this.squash.forward(gateEvaluation);
-    this.cache.miu = gateEvaluation;
-    this.value = output;
-    this.cache.matrix = parse;
-
-    (typeof this.iterative == 'function') ? this.iterative() : null;
-
-    this.chain_derivative = 0;
-
-    return output;
-  };
-
-  this.backpropagate = function () {
-    // No weights to backpropagate to, so derivatives are just updated instead
-    for (var i = 0; i < this.backconnections.length; i++) {
-      var derivative = this.chain_derivative * this.derivative(i, this.cache.matrix, this.cache.miu) * this.squash.derivative(this.value);
-      this.backconnections[i].neurone.chain_derivative += derivative;
-    };
-  };
-
-  this.setDerivativeChain = function (x) {
-    this.chain_derivative = x;
-    return this;
-  };
-
-  this.connect = function (unit, weight) {
-    var unweightedInstance = unit.meta.weighted == false;
-    var weightedInstance = unit.meta.weighted == true;
-    if (!unweightedInstance && !weightedInstance) {
-      throw "[Neuras] Inappropriate connection (to) instance.";
-    };
-
-    if (unit.meta.max_connections < unit.backconnections.length + 1) {
-      throw "[Neuras] Unit can only hold " + unit.meta.max_connections + " connection" + ((unit.meta.max_connections !== 1) ? "s" : "") + "! Stack-trace to find unit!"
-    };
-
-    if (unit.meta.type === 'buffer') {
-      for (var i = 0; i < unit.connections.length; i++) {
-        this.connect(unit.connections[i], weight);
+  } else if (unweightedInstance) {
+        unit.backconnections.push({neurone: this});
+    } else {
+      if (typeof weight !== 'number') {
+        weight = 2 * (Math.random()-.5);
       };
-    } else if (unweightedInstance) {
-          unit.backconnections.push({neurone: this});
-      } else {
-        if (typeof weight !== 'number') {
-          weight = 2 * (Math.random()-.5);
-        };
-        unit.backconnections.push({neurone: this, weight: weight, dropout: false, frozen: false, local_trainrate: Math.random()});
-      };
-    return this;
-  };
+      unit.backconnections.push({neurone: this, weight: weight, dropout: false, frozen: false, local_trainrate: Math.random()});
+    };
+  return this;
+};
 
-  this.getUnsquashedOutput = function () {
-    return this.cache.miu;
-  };
+prototype.getUnsquashedOutput = function () {
+  return this.cache.miu;
+};
 
-  this.disconnectDuplicates = function () {
-    for (var i = 0; i < this.backconnections.length - 1; i++) {
-      for (var j = this.backconnections.length - 1; j > i; j--) {
-        if (this.backconnections[j].neurone === this.backconnections[i].neurone) {
-          this.backconnections.splice(j, 1);
-        };
+prototype.disconnectDuplicates = function () {
+  for (var i = 0; i < this.backconnections.length - 1; i++) {
+    for (var j = this.backconnections.length - 1; j > i; j--) {
+      if (this.backconnections[j].neurone === this.backconnections[i].neurone) {
+        this.backconnections.splice(j, 1);
       };
     };
-    return this;
   };
-
+  return this;
 };
