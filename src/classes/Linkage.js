@@ -4,13 +4,15 @@ var Seeder = require('./Seeder');
 module.exports = function (chronology, autolink) {
   // chronology == layers to forward in order
 
+  var prototype = module.exports.prototype;
+
   if (autolink == true) {
     for (var i = 0; i < chronology.length - 1; i++) {
       chronology[i].connect(chronology[i + 1]);
     };
   };
 
-  this.meta = new Object();
+  prototype.meta = new Object();
   this.meta.type = 'linkage';
   this.meta.weighted = false;
 
@@ -125,7 +127,7 @@ prototype.backpropagate = function (chain_m) {
       throw "[Neuras] Backpropagation set (length: " + chain_m.length + ") should be equal to number of output/hidden (length: " + this.configuration[this.configuration.length - 1][1] + ") Neurones in last Layer!";
     };
 
-    var n = Array.from(chain_m)
+    var n = Array.from(chain_m);
 
     this.setDerivativeChain('last', 'output', n);
 
