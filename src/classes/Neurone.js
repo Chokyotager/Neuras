@@ -5,15 +5,18 @@ var NMatrix = require('./NeuroneMatrix');
 //var Input = require('./Input');
 
 module.exports = function () {
+
+  var prototype = module.exports.prototype;
+
   this.squash = new Squash('tanh');
   this.uuid = uuid();
   this.backconnections = new Array();
   this.biases = 0;
-  this.cache = new Object();
-  this.value = 0;
+  prototype.cache = new Object();
+  prototype.value = 0;
 
-  this.meta = new Object();
-  this.meta.weighted = true;
+  prototype.meta = new Object();
+  prototype.meta.weighted = true;
   this.meta.type = 'neurone';
 
   this.matrix = {
