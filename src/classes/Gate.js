@@ -1,9 +1,12 @@
 var Squash = require('./Squash');
+var Protoneurone = require('./prototypes/Protoneurone');
 
-module.exports = class {
+module.exports = class extends Protoneurone {
 
   constructor (gate, options) {
     // Non-neuronal matrix gates, cannot be weighted
+
+    super();
 
     if (options === undefined) {
       options = new Object;

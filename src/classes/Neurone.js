@@ -2,11 +2,15 @@ var Squash = require('./Squash');
 var Seeder = require('./Seeder');
 var uuid = require('../libs/uuid_generator');
 var NMatrix = require('./NeuroneMatrix');
+var Protoneurone = require('./prototypes/Protoneurone');
 //var Input = require('./Input');
 
-module.exports = class {
+module.exports = class extends Protoneurone {
 
   constructor () {
+
+    super();
+
     this.squash = new Squash('tanh');
     this.uuid = uuid();
     this.backconnections = new Array();
@@ -51,29 +55,6 @@ module.exports = class {
       };
     };
 
-  };
-
-  limitConnections (connections) {
-    if (connections < this.backconnections.length) {
-      throw "[Neuras] Cannot lower backconnection limits than already existing number of connections!";
-    };
-
-    if (typeof connections !== 'number' || connections < 0) {
-      throw "[Neuras] Invalid limit on connections!";
-    };
-
-    this.meta.max_connections = connections;
-    return this;
-  };
-
-  lock () {
-    this.meta.max_connections = this.backconnections.length;
-    return this;
-  };
-
-  unlock () {
-    this.meta.max_connections = Infinity;
-    return this;
   };
 
   addBias (weighted, bias) {
@@ -182,10 +163,6 @@ module.exports = class {
     return frozen;
   };
 
-  getUnsquashedOutput () {
-    return this.cache.miu;
-  };
-
   backpropagate (additiveRate) {
 
     if (this.chain_derivative === undefined) {
@@ -210,11 +187,6 @@ module.exports = class {
       };
     };
     this.chain_derivative = 0;
-    return this;
-  };
-
-  changeSquash (sq, params) {
-    this.squash = new Squash(sq, params);
     return this;
   };
 
@@ -250,17 +222,6 @@ module.exports = class {
     };
   };
 
-  disconnectDuplicates () {
-    for (var i = 0; i < this.backconnections.length - 1; i++) {
-      for (var j = this.backconnections.length - 1; j > i; j--) {
-        if (this.backconnections[j].neurone === this.backconnections[i].neurone) {
-          this.backconnections.splice(j, 1);
-        };
-      };
-    };
-    return this;
-  };
-
   seedWeights (seed) {
     seed = Seeder.from(seed);
 
@@ -287,11 +248,6 @@ module.exports = class {
   seed (seed) {
     this.seedWeights(seed);
     this.seedBiases(seed);
-  };
-
-  setDerivativeChain (x) {
-    this.chain_derivative = x;
-    return this;
   };
 
   static find_backconnection (backconnection, backconnections) {
