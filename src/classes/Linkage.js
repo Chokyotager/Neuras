@@ -2,6 +2,7 @@ var Layer = require('./Layer');
 var Seeder = require('./Seeder');
 
 module.exports = class {
+
   constructor (chronology, autolink) {
     // chronology == layers to forward in order
 

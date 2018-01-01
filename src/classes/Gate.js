@@ -31,7 +31,7 @@ module.exports = class extends Protoneurone {
     //Object.freeze(this.meta);
 
     // Gate enumeration
-    if (typeof gate == "string") {
+    if (typeof gate === "string") {
       switch (gate) {
 
         case "softmax":
@@ -267,9 +267,9 @@ module.exports = class extends Protoneurone {
     this.value = output;
     this.cache.matrix = parse;
 
-    (typeof this.iterative == 'function') ? this.iterative() : null;
+    (typeof this.iterative === 'function') ? this.iterative() : null;
 
-    this.chain_derivative = 0;
+    //this.chain_derivative = 0;
 
     return output;
   };
@@ -280,6 +280,8 @@ module.exports = class extends Protoneurone {
       var derivative = this.chain_derivative * this.derivative(i, this.cache.matrix, this.cache.miu) * this.squash.derivative(this.value);
       this.backconnections[i].neurone.chain_derivative += derivative;
     };
+    this.chain_derivative = 0;
+    return this;
   };
 
   setDerivativeChain (x) {

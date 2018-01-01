@@ -1,3 +1,5 @@
+var Seeder = require('./Seeder');
+
 module.exports = class {
 
   constructor (type, parameters) {
@@ -5,11 +7,14 @@ module.exports = class {
     Math.logab = function (exponent, base) {
       return Math.log(exponent) / Math.log(base);
     };
-    
+
+    typeof parameters !== 'object' ? parameters = new Object() : null;
+    var seed = Seeder.from(parameters.seed);
+
     type = type.toLowerCase();
 
     if (type.substring(0, 7) === 'random-') {
-      typeof parameters !== 'object' ? parameters = new Object() : null;
+
       var enumerate = type.substring(7, type.length);
 
       var possible_types = new Array();
@@ -28,6 +33,14 @@ module.exports = class {
 
         case "sinusoidal":
         possible_types = ['sin', 'cos', 'stippity-step', 'stippity-step-simplified', 'stippity-step-3'];
+        break;
+
+        case "intermediate":
+        possible_types = ['relu', 'leaky-relu', 'continuous-tanh'];
+        break;
+
+        case "intermediate-mixed":
+        possible_types = ['leaky-relu', 'continuous-tanh', 'tanh'];
         break;
 
         case "rangeless":
@@ -67,7 +80,7 @@ module.exports = class {
         throw "[Neuras] Should have at least one squash type in randomiser!";
       };
 
-      type = possible_types[Math.round(Math.random() * (possible_types.length-1))];
+      type = possible_types[Math.round(seed.add('Sq').random() * (possible_types.length-1))];
     };
 
     switch (type) {
@@ -98,7 +111,7 @@ module.exports = class {
       break;
 
       case "randomised-leaky-relu":
-      this.rlrelu = Math.random();
+      this.rlrelu = seed.add('RRSq').random();
       this.evaluate = function (x) {return (x < 0) ? this.rlrelu * x : x};
       this.derivative = function (x) {return (x < 0) ? this.rlrelu : 1};
       break;
@@ -208,7 +221,8 @@ module.exports = class {
       break;
 
       case "modulus":
-      this.evaluate = function (x) {return x % Math.random() * 10};
+      this.modulo_value = seed.add('MODSq').random();
+      this.evaluate = function (x) {return x % (this.modulo_value * 1e2)};
       this.derivative = function (x) {return 1};
       break;
 

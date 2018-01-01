@@ -10,7 +10,7 @@ module.exports = function () {
   var three = new Layer().addGates(1, 'additive').addGates(1, 'multiplicative');*/
 
   var entrance = new Neurone();
-  var input = new Neurone().changeSquash('logistic');
+  var input = new Neurone().changeSquash('logistic').addBias();
   var forget = new Neurone().changeSquash('logistic');
 
   var output = new Neurone().changeSquash('logistic');

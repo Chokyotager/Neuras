@@ -69,7 +69,7 @@ module.exports = class extends Protoneurone {
     this.biases++
     push.neurone.value = bias;
     this.backconnections.unshift(push);
-    return this.backconnections[0];
+    return this;
   };
 
   forward (x) {
@@ -86,13 +86,40 @@ module.exports = class extends Protoneurone {
 
     this.cache.miu = x;
     this.cache.matrix = matrix;
-    this.chain_derivative = 0;
+    //this.chain_derivative = 0;
 
     this.value = output;
 
     this.derivative = this.squash.derivative(x) * this.matrix.miu_prime();;
 
     return output;
+  };
+
+  backpropagate (additiveRate) {
+
+    if (this.chain_derivative === undefined) {
+      throw "[Neuras] Neurone class should have been forwarded prior to backpropagation!";
+    };
+    if (typeof additiveRate !== 'number') {
+      additiveRate = 1;
+    };
+    // backpropagate derivative
+    var derivative = this.chain_derivative * this.derivative * additiveRate;
+    for (var i = 0; i < this.backconnections.length; i++) {
+      // additive rate is multiplied to the current derivative to alter the training rate of the current neurone;
+      // it does not affect the neurones further back the line
+      if (this.backconnections[i].dropout == false && this.backconnections[i].weight !== undefined) {
+
+        if (this.backconnections[i].frozen == false) {
+          this.backconnections[i].weight -= derivative * this.backconnections[i].neurone.value * this.backconnections[i].local_trainrate;
+        };
+
+        //update previous derivatives
+        this.backconnections[i].neurone.chain_derivative += derivative * this.backconnections[i].weight * this.backconnections[i].local_trainrate; //this.squash.derivative(this.cache.miu) * this.chain_derivative * this.backconnections[i].weight;
+      };
+    };
+    this.chain_derivative = 0;
+    return this;
   };
 
   jumbleTrainRate (probability, seed) {
@@ -161,33 +188,6 @@ module.exports = class extends Protoneurone {
       };
     };
     return frozen;
-  };
-
-  backpropagate (additiveRate) {
-
-    if (this.chain_derivative === undefined) {
-      throw "[Neuras] Neurone class should have been forwarded prior to backpropagation!";
-    };
-    if (typeof additiveRate !== 'number') {
-      additiveRate = 1;
-    };
-    // backpropagate derivative
-    var derivative = this.chain_derivative * this.derivative * additiveRate;
-    for (var i = 0; i < this.backconnections.length; i++) {
-      // additive rate is multiplied to the current derivative to alter the training rate of the current neurone;
-      // it does not affect the neurones further back the line
-      if (this.backconnections[i].dropout == false && this.backconnections[i].weight !== undefined) {
-
-        if (this.backconnections[i].frozen == false) {
-          this.backconnections[i].weight -= derivative * this.backconnections[i].neurone.value * this.backconnections[i].local_trainrate;
-        };
-
-        //update previous derivatives
-        this.backconnections[i].neurone.chain_derivative += derivative * this.backconnections[i].weight * this.backconnections[i].local_trainrate; //this.squash.derivative(this.cache.miu) * this.chain_derivative * this.backconnections[i].weight;
-      };
-    };
-    this.chain_derivative = 0;
-    return this;
   };
 
   dropout (probability) {
