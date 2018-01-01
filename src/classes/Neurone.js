@@ -86,7 +86,7 @@ module.exports = class extends Protoneurone {
 
     this.cache.miu = x;
     this.cache.matrix = matrix;
-    //this.chain_derivative = 0;
+    this.chain_derivative = 0;
 
     this.value = output;
 
