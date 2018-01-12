@@ -4,5 +4,6 @@ module.exports = {
   GRU: require('./architectures/gru'),
   Autoencoder: require('./architectures/autoencoder'),
   RBN: require('./architectures/rbn'),
-  Hopfield: require('./architectures/hopfield')
+  Hopfield: require('./architectures/hopfield'),
+  Markov_Chain: require('./architectures/markov_chain')
 };

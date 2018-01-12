@@ -76,6 +76,10 @@ module.exports = class {
     return Object.assign(Object.create(Object.getPrototypeOf(this)), this);
   };
 
+  createDeviant() {
+    return this.clone().seed();
+  };
+
   jumbleTrainRate (probability, seed) {
     (typeof probability !== 'number') ? probability = 1 : null;
 

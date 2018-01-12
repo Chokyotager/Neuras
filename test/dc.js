@@ -1,7 +1,7 @@
 var neuras = require('../src/neura');
 
-var linkage = new neuras.Architecture.Hopfield(2, 'logistic').seed('ChocoParrot');
+var linkage = new neuras.Architecture.Markov_Chain(3, 'identity').seed('ChocoParrot');
 
-for (var i = 0; i < 10; i++) {
-  console.log(linkage.forward([3, 4]));
+for (var i = 0; i < 5; i++) {
+  console.log(linkage.forward([3, 2, 1]));
 };

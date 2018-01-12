@@ -87,8 +87,20 @@ module.exports = class {
   };
 
   addLinkage (linkage) {
+    this.neurones.push(linkage);
+    return this;
+  };
+
+  addLinkages (linkages, linkage) {
+
+    if (typeof linkages !== 'number' || linkages <= 0) {
+      throw "[Neuras] Should add least add one linkage using addLinkages()!";
+    };
 
     this.neurones.push(linkage);
+    for (var i = 0; i < linkages - 1; i++) {
+      this.neurones.push(linkage.createDeviant());
+    };
     return this;
   };
 
@@ -275,7 +287,7 @@ module.exports = class {
 
   disconnectDuplicates () {
     for (var i = 0; i < this.neurones.length; i++) {
-      if (this.neurones[i].meta.type !== 'gate') {
+      if (this.neurones[i].meta.type !== 'buffer') {
         this.neurones[i].disconnectDuplicates();
       };
     };
@@ -310,7 +322,7 @@ module.exports = class {
     this.connectSequentially(layer);
     this.connect(layer);
     layer.disconnectDuplicates();
-    return this;
+    return layer;
   }
 
   getOutput () {
