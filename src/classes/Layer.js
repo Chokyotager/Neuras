@@ -7,6 +7,17 @@ module.exports = class {
 
   constructor () {
     this.neurones = new Array();
+    this.order = {type: 'forward', seed: undefined};
+    this.forwardCount = 0;
+  };
+
+  setFiringOrder (order, seed) {
+    if (order !== 'forward' && order !== 'backward' && order !== 'random') {
+      throw "[Neuras] Order can only be 'forward', 'backward' or 'random'!";
+    };
+    this.order.type = order;
+    this.order.seed = seed;
+    return this;
   };
 
   addNeurones (neurones, squash, params) {
@@ -135,6 +146,16 @@ module.exports = class {
         this.neurones[i].messUpWeights(probability, delta, seed);
       };
     };
+  };
+
+  setWeights (weight) {
+    for (var i = 0; i < this.neurones.length; i++) {
+      if (this.neurones[i].meta.type === 'neurone') {
+        this.neurones[i].setWeights(weight);
+      };
+    };
+
+    return this;
   };
 
   dropoutWeights (probability, seed) {
@@ -332,6 +353,7 @@ module.exports = class {
 
   seed (seed) {
     seed = Seeder.from(seed);
+    this.order.seed = seed.seed;
     for (var i = 0; i < this.neurones.length; i++) {
       if (this.neurones[i].meta.type !== 'gate' && this.neurones[i].meta.type !== 'buffer') {
         this.neurones[i].seed(seed.add(3));
@@ -343,8 +365,9 @@ module.exports = class {
   forward (v) {
     var output = new Array();
       if (v === undefined) {
-        for (var i = 0; i < this.neurones.length; i++) {
-          var out = this.neurones[i].forward();
+        var firingSequence = this.__determineFiringSequence(this.order.type, Seeder.from(this.order.seed).add(this.forwardCount));
+        for (var i = 0; i < firingSequence.length; i++) {
+          var out = this.neurones[firingSequence[i]].forward();
 
           Array.isArray(out) ? output = output.concat(out) : output.push(out);
         };
@@ -361,7 +384,39 @@ module.exports = class {
           };
         };
     };
+    this.forwardCount++;
     return output;
   };
-  
+
+  __determineFiringSequence (type, seed) {
+    var arx = new Array(this.neurones.length);
+    for (var i = 0; i < arx.length; i++) {
+      arx[i] = i;
+    };
+
+    switch (type) {
+      case "backward":
+        arx.reverse();
+        break;
+
+      case "random":
+        shuffle(arx, seed);
+        break;
+    };
+
+    return arx;
+  };
+
+};
+
+function shuffle (a, seed) {
+  // Fisher-Yates
+  seed = Seeder.from(seed);
+  for (var i = 0; i < a.length; i++) {
+    var index = Math.floor(seed.add('#').random() * a.length);
+
+    var cache = a[i];
+    a[i] = a[index];
+    a[index] = cache;
+  };
 };

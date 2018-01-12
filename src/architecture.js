@@ -3,5 +3,6 @@ module.exports = {
   LSTM: require('./architectures/lstm'),
   GRU: require('./architectures/gru'),
   Autoencoder: require('./architectures/autoencoder'),
-  RBN: require('./architectures/rbn')
+  RBN: require('./architectures/rbn'),
+  Hopfield: require('./architectures/hopfield')
 };

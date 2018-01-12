@@ -57,6 +57,16 @@ module.exports = class extends Protoneurone {
 
   };
 
+  setWeights (weight) {
+    (typeof weight !== 'number') ? weight = 1 : null;
+
+    for (var i = 0; i < this.backconnections.length; i++) {
+        this.backconnections[i].weight = weight;
+    };
+
+    return this;
+  };
+
   addBias (weighted, bias) {
     var push = {neurone: {type: 'bias', uuid: uuid()}, dropout: false};
     if (weighted == true) {
@@ -250,13 +260,13 @@ module.exports = class extends Protoneurone {
     this.seedBiases(seed);
   };
 
-  static find_backconnection (backconnection, backconnections) {
-    for (var i = 0; i < backconnections.length; i++) {
-      if (backconnection == backconnections[i]) {
-        return i;
-      };
-    };
-    throw "[Neuras] Cannot find backconnection in neurone!";
-  };
+};
 
+function find_backconnection (backconnection, backconnections) {
+  for (var i = 0; i < backconnections.length; i++) {
+    if (backconnection == backconnections[i]) {
+      return i;
+    };
+  };
+  throw "[Neuras] Cannot find backconnection in neurone!";
 };
