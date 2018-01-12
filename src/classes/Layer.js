@@ -323,8 +323,9 @@ module.exports = class {
 
   backpropagate () {
 
-    for (var i = this.neurones.length - 1; i >= 0; i--) {
-      this.neurones[i].backpropagate();
+    var firingSequence = this.__determineFiringSequence(this.order.type, Seeder.from(this.order.seed).add(this.forwardCount));
+    for (var i = firingSequence.length - 1; i >= 0; i--) {
+      this.neurones[firingSequence[i]].backpropagate();
     };
 
     return this;
