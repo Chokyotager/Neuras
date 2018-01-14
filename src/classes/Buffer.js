@@ -5,13 +5,12 @@ module.exports = class {
 
   constructor () {
 
-    this.connections = new Array();
-
     this.meta = new Object();
     this.meta.type = 'buffer';
     this.meta.weighted = false;
     this.meta.max_connections = Infinity;
 
+    this.connections = new Array();
     this.backconnections = new Array();
 
     Object.freeze(this.meta);
@@ -51,7 +50,18 @@ module.exports = class {
   };
 
   forward () {
-    return new Array();
+
+    var a = new Array();
+
+    for (var i = 0; i < this.backconnections.length; i++) {
+      if (this.backconnections[i].meta.type === 'buffer') {
+        a.concat(this.backconnections[i].values);
+      };
+      a.push(this.backconnection[i].value);
+    };
+    this.values = a;
+    return a;
+
   };
 
   backpropagate () {
