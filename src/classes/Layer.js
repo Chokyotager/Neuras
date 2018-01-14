@@ -379,11 +379,16 @@ module.exports = class {
     var output = new Array();
       if (v === undefined) {
         var firingSequence = this.__determineFiringSequence(this.order.type, Seeder.from(this.order.seed).add(this.forwardCount));
+        var temp = new Array(firingSequence.length);
         for (var i = 0; i < firingSequence.length; i++) {
           var out = this.neurones[firingSequence[i]].forward();
-
-          Array.isArray(out) ? output = output.concat(out) : output.push(out);
+          temp[firingSequence[i]] = out;
         };
+
+        for (var i = 0; i < temp.length; i++) {
+          Array.isArray(temp[i]) ? output = output.concat(temp[i]) : output.push(temp[i]);
+        };
+
       } else {
         if (this.getInputCount() !== v.length) {
           throw "[Neuras] Forward input array (length: " + v.length + ") does not equate to number of Neurone classes in Layer (length: " + this.neurones.length + ")!";
