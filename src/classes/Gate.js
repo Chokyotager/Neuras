@@ -301,6 +301,7 @@ module.exports = class extends Protoneurone {
     };
 
     if (unit.meta.type === 'buffer') {
+      unit.backconnections.push(this);
       for (var i = 0; i < unit.connections.length; i++) {
         this.connect(unit.connections[i], weight);
       };

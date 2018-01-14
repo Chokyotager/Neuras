@@ -54,10 +54,7 @@ module.exports = class {
     var a = new Array();
 
     for (var i = 0; i < this.backconnections.length; i++) {
-      if (this.backconnections[i].meta.type === 'buffer') {
-        a.concat(this.backconnections[i].values);
-      };
-      a.push(this.backconnection[i].value);
+      a.push(this.backconnections[i].value);
     };
     this.values = a;
     return a;
