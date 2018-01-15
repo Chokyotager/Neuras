@@ -27,4 +27,4 @@ for (var i = 0; i < 10000; i++) {
   train(training_sets);
 };
 
-console.log(rar(linkage.forward([0, 0, 0, 0, 0])));
+console.log(rar(linkage.forward([0, 0, 0, 1, 0])));

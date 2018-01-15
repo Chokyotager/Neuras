@@ -9,10 +9,14 @@ module.exports = function (inputs, additional, terminal, intermediate, ordering_
   var l2 = new Layer().addNeurones(inputs, terminal).setFiringOrder('random', ordering_seed);
   var l3 = new Layer().addBuffers(1);
 
-  l1.connect(l2).setWeights(1).selfconnect().connect(l3);
+  l1.connect(l2).setWeights(1).connect(l3);
   l1.freezeNeurones().lock();
 
-  l2.addNeurones(additional, terminal);
+  l2.addNeurones(additional, terminal).selfconnect();
+
+  for (var i = 0; i < l2.neurones.length; i++) {
+    l2.neurones[i].removeSelfConnections();
+  };
 
   return new Linkage([l1, l2, l3]);
 

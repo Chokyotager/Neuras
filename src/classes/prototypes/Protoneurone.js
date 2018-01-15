@@ -76,4 +76,14 @@ module.exports = class {
     return this;
   };
 
+  removeSelfConnections () {
+    for (var i = 0; i < this.backconnections.length; i++) {
+      // delete selfconnections
+      if (this.backconnections[i].neurone === this) {
+        this.backconnections.splice(i, 1);
+      };
+    };
+    return this;
+  };
+
 };
