@@ -284,11 +284,6 @@ module.exports = class extends Protoneurone {
     return this;
   };
 
-  setDerivativeChain (x) {
-    this.chain_derivative = x;
-    return this;
-  };
-
   connect (unit, weight) {
     var unweightedInstance = unit.meta.weighted == false;
     var weightedInstance = unit.meta.weighted == true;
