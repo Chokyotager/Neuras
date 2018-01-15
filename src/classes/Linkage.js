@@ -27,9 +27,12 @@ module.exports = class {
       var layerconf = [0, 0];
 
       for (var j = 0; j < chronology[i].neurones.length; j++) {
-        if (chronology[i].neurones[j].meta.type == 'linkage') {
+        if (chronology[i].neurones[j].meta.type === 'linkage') {
           layerconf[0] += chronology[i].neurones[j].configuration[0][0];
           layerconf[1] += chronology[i].neurones[j].configuration[chronology[i].neurones[j].configuration.length - 1][1];
+        } else if (chronology[i].neurones[j].meta.type === 'buffer') {
+          layerconf[0] += chronology[i].neurones[j].backconnections.length;
+          layerconf[1] += chronology[i].neurones[j].backconnections.length;
         } else {
           layerconf[0]++;
           layerconf[1]++;
@@ -247,8 +250,13 @@ module.exports = class {
 
     var res = new Array();
     for (var i = 0; i < this.chronology[layer].neurones.length; i++) {
-        if (this.chronology[layer].neurones[i].meta.type == "linkage") {
+        if (this.chronology[layer].neurones[i].meta.type === "linkage") {
           this.chronology[layer].neurones[i].setDerivativeChain(type, 'last', chain_m);
+        } else if (this.chronology[layer].neurones[i].meta.type === "buffer") {
+          // set array'd deriv chain for buffers
+          // splice array
+          var splicable = chain_m.splice(0, this.chronology[layer].neurones[i].backconnections.length);
+          this.chronology[layer].neurones[i].setDerivativeChain(splicable);
         } else {
           this.chronology[layer].neurones[i].setDerivativeChain(chain_m[0]);
           chain_m.shift();

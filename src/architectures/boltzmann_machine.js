@@ -1,7 +1,7 @@
 var Layer = require('../classes/Layer');
 var Linkage = require('../classes/Linkage');
 
-module.exports = function (inputs, additional, terminal, ordering_seed) {
+module.exports = function (inputs, additional, terminal, intermediate, ordering_seed) {
 
   (typeof terminal !== 'string') ? terminal = 'binary-step' : null;
 

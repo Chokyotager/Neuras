@@ -149,6 +149,12 @@ module.exports = class {
     var losses = new Array();
     var derivatives = new Array();
 
+    if (!Array.isArray(input) || !Array.isArray(expected)) {
+      throw "[Neuras] Input and expected output should be defined in Mentor training!";
+    };
+
+    (typeof rate !== 'number') ? rate = 1 : null;
+
     var output = this.linkage.forward(input);
 
     for (var i = 0; i < expected.length; i++) {

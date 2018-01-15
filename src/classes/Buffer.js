@@ -24,11 +24,21 @@ module.exports = class {
       throw "[Neuras] Inappropriate connection (to) instance.";
     };
 
+    // Disallow connections to buffers
+    if (unit instanceof module.exports) {
+      throw "[Neuras] Buffers cannot connect to other Buffers!";
+    };
+
     if (unit.meta.max_connections < unit.backconnections.length + 1) {
       throw "[Neuras] Unit can only hold " + unit.meta.max_connections + " connection" + ((unit.meta.max_connections > 1) ? "s" : "") + "! Stack-trace to find unit!"
     };
 
     this.connections.push(unit);
+
+    // force connections on backconnections
+    for (var i = 0; i < this.backconnections.length; i++) {
+      this.backconnections[i].neurone.connect(this, weight);
+    };
 
     if (unit.meta.max_connections !== undefined) {
       this.meta.max_connections = Math.min(unit.meta.max_connections, this.meta.max_connections);
@@ -61,8 +71,22 @@ module.exports = class {
 
   };
 
+  setDerivativeChain (m) {
+    if (!Array.isArray(m)) {
+      throw "[Neuras] setDerivativeChain() of Buffer should contain an Array!";
+    } else if (m.length !== this.backconnections.length) {
+      throw "[Neuras] Length of Array should be equivalent to number of backconnections in Buffer setDerivativeChain()!";
+    };
+
+    for (var i = 0; i < m.length; i++) {
+      // Low-level connections only
+      this.backconnections[i].setDerivativeChain(m[i]);
+    };
+
+  };
+
   backpropagate () {
-    return null;
+    return this;
   };
 
 };
