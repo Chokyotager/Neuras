@@ -168,4 +168,8 @@ module.exports = class {
     return losses;
   };
 
+  reciprocalTrain (input, rate) {
+    return this.train(input, input, rate);
+  };
+
 };
