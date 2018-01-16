@@ -57,8 +57,19 @@ module.exports = class {
     return latest;
   };
 
-  passivelyForward (m) {
-    return this.clone().forward(m);
+  passivelyForward (m, times, options) {
+    typeof times !== 'number' ? times = 1 : null;
+
+    options = options || new Object();
+
+    var logs = new Array();
+    var clone = this.clone();
+    for (var i = 0; i < times; i++) {
+      logs.push(clone.forward(m));
+      options.loop == true ? m = logs[i] : null;
+    };
+
+    return options.log == true ? logs : logs[times - 1];
   };
 
   merge (linkage, connect) {

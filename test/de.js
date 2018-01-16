@@ -1,6 +1,6 @@
 var neuras = require('../src/neura');
 
-var linkage = new neuras.Architecture.Boltzmann_Machine(5, 2, 'logistic', 'continuous-tanh');
+var linkage = new neuras.Architecture.Hopfield(5, 'logistic');
 
 /*
 for (var i = 0; i < 5; i++) {
@@ -23,10 +23,15 @@ function rar (arx) {
   return arx;
 };
 
+/*
+function rar (arx) {
+  return arx;
+};*/
+
 for (var i = 0; i < 100000; i++) {
   train(training_sets);
 };
 
-console.log(rar(linkage.passivelyForward([1, 0, 0, 0, 1]))); // [10101]
-console.log(rar(linkage.passivelyForward([0, 0, 0, 1, 0]))); // [00011]
-console.log(rar(linkage.passivelyForward([0, 1, 1, 0, 0]))); // [11100]
+console.log(rar(linkage.passivelyForward([1, 0, 0, 0, 1], 6, {loop: true}))); // [10101]
+console.log(rar(linkage.passivelyForward([0, 0, 0, 1, 0], 6, {loop: true}))); // [00011]
+console.log(rar(linkage.passivelyForward([0, 1, 1, 0, 0], 6, {loop: true}))); // [11100]
