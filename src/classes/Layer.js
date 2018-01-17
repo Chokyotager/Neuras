@@ -299,9 +299,7 @@ module.exports = class {
       throw "[Neuras] Can only connect to Layer classes!";
     };
 
-    if (typeof probability != 'number') {
-      probability = 1;
-    };
+    (typeof probability !== 'number') ? probability = 1 : null;
 
     seed = Seeder.from(seed);
 
