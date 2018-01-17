@@ -7,6 +7,8 @@ var Canvas = require('../canvas');
 module.exports = function (layers, selfconnect) {
   var layered = new Array();
 
+  layered.push(new Layer().addNeurones(layers[i]));
+
   for (var i = 0; i < layers.length; i++) {
     var current = new Layer();
     for (var j = 0; j < layers[i]; j++) {
@@ -19,5 +21,11 @@ module.exports = function (layers, selfconnect) {
     layered.push(current);
   };
 
-  return new Linkage(layered, true);
+  layered[0].connectSequentially(layered[1]);
+
+  for (var i = 1; i < layered.length - 1; i++) {
+    layered[i].connect(layered[i + 1]);
+  };
+
+  return new Linkage(layered);
 };
