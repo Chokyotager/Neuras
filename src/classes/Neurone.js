@@ -17,6 +17,7 @@ module.exports = class extends Protoneurone {
     this.biases = 0;
     this.cache = new Object();
     this.value = 0;
+    this.chain_derivative = 0;
 
     this.meta = new Object();
     this.meta.weighted = true;
@@ -107,12 +108,8 @@ module.exports = class extends Protoneurone {
 
   backpropagate (additiveRate) {
 
-    if (this.chain_derivative === undefined) {
-      throw "[Neuras] Neurone class should have been forwarded prior to backpropagation!";
-    };
-    if (typeof additiveRate !== 'number') {
-      additiveRate = 1;
-    };
+    (typeof additiveRate !== 'number') ? additiveRate = 1 : null;
+
     // backpropagate derivative
     var derivative = this.chain_derivative * this.derivative * additiveRate;
     for (var i = 0; i < this.backconnections.length; i++) {
