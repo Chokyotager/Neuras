@@ -42,7 +42,11 @@ module.exports = class {
 
   selfconnect (probability, seed) {
     seed = Seeder.from(seed);
-    this.connect(this, probability, seed.add(1));
+    for (var i = 0; i < this.neurones.length; i++) {
+      if (seed.add(1).random() < probability) {
+        this.neurones[i].connect(this.neurones[i]);
+      };
+    };
     return this;
   };
 
