@@ -227,8 +227,69 @@ module.exports = class {
     return this;
   };
 
+  getIONeurones (layer, in_out) {
+
+    if (typeof layer !== 'number') {
+      switch (layer) {
+      case "last":
+        layer = this.chronology.length - 1;
+        break;
+
+      case "first":
+        layer = 0;
+        break;
+
+      default:
+        layer = this.chronology.length - 1;
+        break;
+      };
+    };
+
+    var type;
+    switch (in_out) {
+      case "input":
+        type = 0;
+        break;
+
+      case "output":
+        type = "last";
+        break;
+
+      default:
+        type = "last";
+        break;
+    };
+
+    var res = new Array();
+
+    for (var i = 0; i < this.chronology[layer].neurones.length; i++) {
+        if (this.chronology[layer].neurones[i].meta.type === "linkage") {
+          this.chronology[layer].neurones[i].getIONeurones(type, type);
+        } else {
+          res.push(this.chronology[layer].neurones[i]);
+        };
+    };
+    return res;
+
+  };
+
   setDerivativeChain (type, layer, chain_m) {
 
+    var neurones = this.getIONeurones(layer, type);
+
+    for (var i = 0; i < neurones.length; i++) {
+      if (neurones[i].meta.type === "buffer") {
+          // set array'd deriv chain for buffers
+          // splice array
+          var splicable = chain_m.splice(0, neurones[i].backconnections.length);
+          neurones[i].setDerivativeChain(splicable);
+        } else {
+          neurones[i].setDerivativeChain(chain_m[0]);
+          chain_m.shift();
+        };
+    };
+
+    /*
     if (typeof layer !== 'number') {
       switch (layer) {
       case "last":
@@ -275,6 +336,6 @@ module.exports = class {
 
     };
     return res;
+  };*/
   };
-
 };
