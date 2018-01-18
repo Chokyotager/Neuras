@@ -235,7 +235,15 @@ module.exports = class {
         layer = this.chronology.length - 1;
         break;
 
+      case "output":
+        layer = this.chronology.length - 1;
+        break;
+
       case "first":
+        layer = 0;
+        break;
+
+      case "input":
         layer = 0;
         break;
 
