@@ -73,6 +73,9 @@ module.exports = class {
   };
 
   merge (linkage, connect) {
+
+    console.warn("[Neuras] Method deprecated (for now). Use .append() instead!");
+
     if (!(linkage instanceof module.exports)) {
       throw "[Neuras] Can only merge to Linkage classes!";
     };
@@ -288,7 +291,7 @@ module.exports = class {
     for (var i = 0; i < neurones.length; i++) {
       if (neurones[i].meta.type === "buffer") {
           // set array'd deriv chain for buffers
-          // splice array
+            // splice array
           var splicable = chain_m.splice(0, neurones[i].backconnections.length);
           neurones[i].setDerivativeChain(splicable);
         } else {
@@ -296,7 +299,6 @@ module.exports = class {
           chain_m.shift();
         };
     };
-
     /*
     if (typeof layer !== 'number') {
       switch (layer) {
@@ -346,4 +348,52 @@ module.exports = class {
     return res;
   };*/
   };
+
+  append (item, connect) {
+    var isLayer = item instanceof Layer;
+    var isLinkage = item instanceof module.exports;
+
+    connect !== false ? connect = true : null;
+
+    if (!isLayer && !isLinkage) {
+      throw "[Neuras] Append object should be either a Layer or Linkage!";
+    };
+
+    connect ? this.connect(item) : null;
+
+    if (isLayer) {
+      this.chronology.push(item);
+      this.configuration.push([item.__getIONeurones('input'), item.__getIONeurones('output')]);
+    } else {
+      this.chronology = this.chronology.concat(item.chronology);
+      this.configuration = this.configuration.concat(item.configuration);
+    };
+    return this;
+  };
+
+  prepend (item, connect) {
+    var isLayer = item instanceof Layer;
+    var isLinkage = item instanceof module.exports;
+
+    connect !== false ? connect = true : null;
+
+    if (!isLayer && !isLinkage) {
+      throw "[Neuras] Append object should be either a Layer or Linkage!";
+    };
+
+    connect ? this.connect(item) : null;
+    if (isLayer) {
+      this.chronology.unshift(item);
+      this.configuration.unshift([item.__getIONeurones('input'), item.__getIONeurones('output')]);
+    } else {
+      this.chronology = item.chronology.concat(this.chronology);
+      this.configuration = item.configuration.concat(this.configuration);
+    };
+    return this;
+  };
+
+  prependInput () {
+
+  };
+
 };

@@ -307,11 +307,14 @@ module.exports = class {
 
     seed = Seeder.from(seed);
 
-    var potential_connections = Math.min(this.neurones.length, layer.neurones.length);
+    // Cycle through linkage chronology
+    var latter_inputs = this.__getIONeurones('input');
+
+    var potential_connections = Math.min(this.neurones.length, latter_inputs.length);
 
     for (var i = 0; i < potential_connections; i++) {
       if (seed.add(1).random() < probability) {
-        this.neurones[i].connect(layer.neurones[i], seed);
+        this.neurones[i].connect(latter_inputs[i], seed);
       };
     };
     return layer;
@@ -354,18 +357,6 @@ module.exports = class {
     return ret;
   };
 
-  getInputCount () {
-    var count = 0;
-    for (var i = 0; i < this.neurones.length; i++) {
-      if (this.neurones[i].meta.type === 'linkage') {
-        count += this.neurones[i].configuration[0][0];
-      } else {
-        count++;
-      };
-    };
-    return count;
-  };
-
   seed (seed) {
     seed = Seeder.from(seed);
     this.order.seed = seed.seed;
@@ -392,8 +383,8 @@ module.exports = class {
         };
 
       } else {
-        if (this.getInputCount() !== v.length) {
-          throw "[Neuras] Forward input array (length: " + v.length + ") does not equate to number of Neurone classes in Layer (length: " + this.neurones.length + ")!";
+        if (this.__getIONeurones('input').length !== v.length) {
+          throw "[Neuras] Forward input array (length: " + v.length + ") does not equate to number of Neurone classes in Layer (length: " + this.__getIONeurones('input').length + ")!";
         };
         for (var i = 0; i < this.neurones.length; i++) {
           if (this.neurones[i].meta.type === 'linkage') {
@@ -425,6 +416,24 @@ module.exports = class {
     };
 
     return arx;
+  };
+
+  __getIONeurones (type) {
+
+    (type !== 'input' && type !== 'output') ? type = 'input' : null;
+
+    var res = new Array();
+
+    for (var i = 0; i < this.neurones.length; i++) {
+      if (this.neurones[i].meta.type === 'linkage') {
+        res.concat(this.neurones[i].getIONeurones(type, type));
+      } else {
+        res.push(this.neurones[i]);
+      };
+    };
+
+    return res;
+
   };
 
 };
