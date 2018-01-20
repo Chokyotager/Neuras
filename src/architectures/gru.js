@@ -14,8 +14,7 @@ module.exports = function (layers, selfconnect) {
     };
     // Self-connect
     if (selfconnect) {
-      current.connect(current);
-      current.disconnectDuplicates();
+      current.selfconnect();
     };
     layered.push(current);
   };

@@ -7,7 +7,7 @@ var Canvas = require('../canvas');
 module.exports = function (layers, selfconnect) {
   var layered = new Array();
 
-  layered.push(new Layer().addNeurones(layers[i]));
+  layered.push(new Layer().addNeurones(layers[0], 'identity'));
 
   for (var i = 0; i < layers.length; i++) {
     var current = new Layer();
@@ -20,6 +20,8 @@ module.exports = function (layers, selfconnect) {
     };
     layered.push(current);
   };
+
+  console.log('SEQUENTIAL!!!!');
 
   layered[0].connectSequentially(layered[1]);
 
