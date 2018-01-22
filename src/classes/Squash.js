@@ -256,6 +256,10 @@ module.exports = class {
       this.derivative = function (x) {return Math.cos(10 * x) + 1};
       break;
 
+      case "continuous-variant-tanh":
+      this.evaluate = function (x) {return 200 * Math.sin(0.005 * x) + x};
+      this.derivative = function (x) {return Math.cos(0.005 * x) + 1};
+
       case "incremented-sin":
       this.evaluate = function (x) {return 0.5 * Math.sin(x) + 0.5};
       this.derivative = function (x) {return 0.5 * Math.cos(x)};
