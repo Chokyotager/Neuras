@@ -259,9 +259,15 @@ module.exports = class {
       case "continuous-variant-tanh":
       this.evaluate = function (x) {return 200 * Math.sin(0.005 * x) + x};
       this.derivative = function (x) {return Math.cos(0.005 * x) + 1};
+      break;
 
       case "incremented-sin":
       this.evaluate = function (x) {return 0.5 * Math.sin(x) + 0.5};
+      this.derivative = function (x) {return 0.5 * Math.cos(x)};
+      break;
+
+      case "super-sin":
+      this.evaluate = function (x) {return 0.5 * Math.sin(x) + 0.4999999};
       this.derivative = function (x) {return 0.5 * Math.cos(x)};
       break;
 
