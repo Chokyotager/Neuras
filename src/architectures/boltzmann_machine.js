@@ -12,7 +12,7 @@ module.exports = function (inputs, additional, terminal, intermediate, ordering_
   l1.connect(l2).setWeights(1).connect(l3);
   l1.freezeNeurones().lock();
 
-  l2.addNeurones(additional, terminal).selfconnect();
+  l2.addNeurones(additional, intermediate).selfconnect();
 
   for (var i = 0; i < l2.neurones.length; i++) {
     l2.neurones[i].removeSelfConnections();
