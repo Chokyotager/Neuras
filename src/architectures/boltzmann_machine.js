@@ -4,6 +4,7 @@ var Linkage = require('../classes/Linkage');
 module.exports = function (inputs, additional, terminal, intermediate, ordering_seed) {
 
   (typeof terminal !== 'string') ? terminal = 'binary-step' : null;
+  (typeof intermediate !== 'string') ? intermediate = 'signum' : null;
 
   var l1 = new Layer().addNeurones(inputs, 'identity');
   var l2 = new Layer().addNeurones(inputs, terminal).setFiringOrder('random', ordering_seed);
