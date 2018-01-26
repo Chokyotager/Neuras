@@ -276,6 +276,11 @@ module.exports = class {
       this.derivative = function (x) {return 0.4 * Math.sin(x) * Math.cos(x) + 1};
       break;
 
+      case "binary-logistic":
+      this.evaluate = function (x) {return (x < 0) ? 0 : 1};
+      this.derivative = function (x) {return Math.pow(Math.E, x) / Math.pow((Math.pow(Math.E, x) + 1), 2)};
+      break;
+
       // Custom & default
       case "custom":
       try {
