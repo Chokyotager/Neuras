@@ -1,4 +1,5 @@
 var Optimiser = require('./Optimiser');
+var LossFunction = require('./prototypes/LossFunction');
 
 module.exports = class {
 
@@ -6,50 +7,7 @@ module.exports = class {
 
     typeof json !== 'object' ? json = new Object() : null;
 
-    var lossFunction = new String();
-    typeof json.lossFunction !== 'string' ? lossFunction = json.lossFunction : lossFunction = json.lossFunction.toString();
-
-    switch (json.lossFunction) {
-      case "mean-squared":
-        this.evaluate = function (y, yhat) {return 1/2 * Math.pow((y - yhat), 2)};
-        this.derivative = function (y, yhat) {return -(y - yhat)};
-        break;
-
-      case "cross-entropy":
-        this.evaluate = function (y, yhat) {return -y * Math.log(yhat + 10e-30)};
-        this.derivative = function (y, yhat) {return (yhat - y)};
-        break;
-
-      case "linear":
-        this.evaluate = function (y, yhat) {return y - yhat};
-        this.derivative = function (y, yhat) {return -1};
-        break;
-
-      case "mean-cubed":
-        this.evaluate = function (y, yhat) {return 1/3 * Math.pow((y - yhat), 3)};
-        this.derivative = function (y, yhat) {return -Math.pow((y - yhat), 2)};
-        break;
-
-      case "mean-quad":
-        this.evaluate = function (y, yhat) {return 1/4 * Math.pow((y - yhat), 4)};
-        this.derivative = function (y, yhat) {return -Math.pow((y - yhat), 3)};
-        break;
-
-      case "abs":
-        this.evaluate = function (y, yhat) {return Math.abs(y - yhat)};
-        this.derivative = function (y, yhat) {return (y-yhat) !== 0 ? -(y-yhat)/Math.abs(y-yhat) : 0};
-        break;
-
-      case "log-cosh":
-        this.evaluate = function (y, yhat) {return Math.log(Math.cosh(y - yhat))};
-        this.derivative = function (y, yhat) {return -(Math.log(Math.E) * Math.sinh(y - yhat))/Math.cosh(y - yhat)};
-        break;
-
-      default:
-        this.evaluate = function (y, yhat) {return 1/2 * Math.pow((y - yhat), 2)};
-        this.derivative = function (y, yhat) {return -(y - yhat)};
-        break;
-    };
+    this.loss = new LossFunction(json.lossFunction);
 
     this.linkage = linkage;
     this.config = json;
@@ -112,8 +70,8 @@ module.exports = class {
     for (var i = 0; i < train_count; i++) {
       var out = this.linkage.forward(inputs[i]);
       for (var j = 0; j < out_count; j++) {
-        losses[j] += this.evaluate(outputs[i][j], out[j]) * ratio;
-        derivatives[j] += this.derivative(outputs[i][j], out[j]) * ratio;
+        losses[j] += this.loss.evaluate(outputs[i][j], out[j]) * ratio;
+        derivatives[j] += this.loss.derivative(outputs[i][j], out[j]) * ratio;
       };
     };
 
@@ -158,8 +116,8 @@ module.exports = class {
     var output = this.linkage.forward(input);
 
     for (var i = 0; i < expected.length; i++) {
-      losses.push(this.evaluate(expected[i], output[i]));
-      derivatives.push(this.derivative(expected[i], output[i]));
+      losses.push(this.loss.evaluate(expected[i], output[i]));
+      derivatives.push(this.loss.derivative(expected[i], output[i]));
     };
 
     var updated_derivatives = this.optimiser.optimise(derivatives);
