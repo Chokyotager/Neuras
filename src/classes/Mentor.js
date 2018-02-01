@@ -25,6 +25,13 @@ module.exports = class {
     return this;
   };
 
+  setLossFunction (lossFunction) {
+    var out = this.loss.changeLoss(lossFunction);
+    if (!out) {
+      throw "[Neuras] Invalid loss function switch!";
+    };
+  };
+
   batchTrain (inputs, outputs, rate, batch) {
     if (inputs.length !== outputs.length) {
       throw "[Neuras] Number of inputs should be the same as outputs";
