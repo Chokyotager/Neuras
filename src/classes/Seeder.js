@@ -20,14 +20,14 @@ module.exports = class {
     return ((sum * 32416190071) % 1300979) / 1300979;
   };
 
-};
-
-module.exports.from = function (val) {
-  if (val instanceof module.exports) {
-    return val;
-  } else if (val === undefined) {
-    return new module.exports(Math.random() * 27913279);
-  } else {
-    return new module.exports(val);
+  static from (val) {
+    if (val instanceof module.exports) {
+      return val;
+    } else if (val === undefined) {
+      return new module.exports(Math.random() * 27913279);
+    } else {
+      return new module.exports(val);
+    };
   };
+
 };
