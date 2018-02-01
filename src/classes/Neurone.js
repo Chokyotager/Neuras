@@ -118,7 +118,7 @@ module.exports = class extends Protoneurone {
       if (this.backconnections[i].dropout == false && this.backconnections[i].weight !== undefined) {
 
         if (this.backconnections[i].frozen == false) {
-          this.backconnections[i].weight -= derivative * this.backconnections[i].neurone.value * this.backconnections[i].local_trainrate;
+          this.backconnections[i].weight = this.backconnections[i].weight - (this.backconnections[i].neurone.value * this.backconnections[i].weight)/(derivative * this.backconnections[i].neurone.value * this.backconnections[i].local_trainrate);
         };
 
         //update previous derivatives
