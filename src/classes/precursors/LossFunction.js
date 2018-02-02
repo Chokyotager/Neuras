@@ -74,6 +74,11 @@ function enumerateTypes (lossFunction) {
       ret.derivative = function (y, yhat) {return (y-yhat) !== 0 ? -(y-yhat)/Math.abs(y-yhat) : 0};
       break;
 
+    case "straight-square":
+      ret.evaluate = function (y, yhat) {return y - yhat};
+      ret.derivative = function (y, yhat) {return Math.max(-1, Math.min(1, -(y - yhat)))};
+      break;
+
     case "log-cosh":
       ret.evaluate = function (y, yhat) {return Math.log(Math.cosh(y - yhat))};
       ret.derivative = function (y, yhat) {return -(Math.log(Math.E) * Math.sinh(y - yhat))/Math.cosh(y - yhat)};
