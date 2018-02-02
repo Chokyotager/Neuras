@@ -1,5 +1,5 @@
 var Optimiser = require('./Optimiser');
-var LossFunction = require('./prototypes/LossFunction');
+var LossFunction = require('./precursors/LossFunction');
 
 module.exports = class {
 
