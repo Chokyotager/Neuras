@@ -1,6 +1,5 @@
 var Squash = require('./Squash');
 var Seeder = require('./Seeder');
-var uuid = require('../libs/uuid_generator');
 var NMatrix = require('./NeuroneMatrix');
 var Protoneurone = require('./prototypes/Protoneurone');
 //var Input = require('./Input');
@@ -12,7 +11,6 @@ module.exports = class extends Protoneurone {
     super();
 
     this.squash = new Squash('tanh');
-    this.uuid = uuid();
     this.backconnections = new Array();
     this.biases = 0;
     this.cache = new Object();
@@ -69,7 +67,7 @@ module.exports = class extends Protoneurone {
   };
 
   addBias (weighted, bias) {
-    var push = {neurone: {type: 'bias', uuid: uuid()}, dropout: false};
+    var push = {neurone: {type: 'bias'}, dropout: false};
     if (weighted == true) {
       push.weight = 2 * (Math.random()-.5);
     };
@@ -213,12 +211,6 @@ module.exports = class extends Protoneurone {
     return drops;
   };
 
-  monodropout (backconnection) {
-    var index = find_backconnection(backconnection, this.backconnections);
-    this.backconnections[index].dropout = !this.backconnections[index].dropout;
-    return this.backconnections[index].dropout;
-  };
-
   extinguish () {
     this.dropout(1);
     return this;
@@ -258,13 +250,4 @@ module.exports = class extends Protoneurone {
     this.seedBiases(seed);
   };
 
-};
-
-function find_backconnection (backconnection, backconnections) {
-  for (var i = 0; i < backconnections.length; i++) {
-    if (backconnection == backconnections[i]) {
-      return i;
-    };
-  };
-  throw "[Neuras] Cannot find backconnection in neurone!";
 };
