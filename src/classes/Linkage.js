@@ -170,15 +170,20 @@ module.exports = class {
 
     var output = this.chronology[this.chronology.length - 1];
 
-    for (var i = 0; i < output.neurones.length; i++) {
-      if (seed.add(1).random() < probability) {
-        if (unit.meta.type == 'linkage') {
-          output.connect(unit.chronology[0]);
-        } else {
-          output.neurones[i].connect(unit);
+    if (unit instanceof Layer) {
+      output.connect(unit);
+    } else {
+      for (var i = 0; i < output.neurones.length; i++) {
+        if (seed.add(1).random() < probability) {
+          if (unit.meta.type == 'linkage') {
+            output.connect(unit.chronology[0]);
+          } else {
+            output.neurones[i].connect(unit);
+          };
         };
       };
     };
+
     return unit;
   };
 
@@ -363,7 +368,7 @@ module.exports = class {
 
     if (isLayer) {
       this.chronology.push(item);
-      this.configuration.push([item.__getIONeurones('input'), item.__getIONeurones('output')]);
+      this.configuration.push([item.__getIONeurones('input').length, item.__getIONeurones('output').length]);
     } else {
       this.chronology = this.chronology.concat(item.chronology);
       this.configuration = this.configuration.concat(item.configuration);
@@ -384,7 +389,7 @@ module.exports = class {
     connect ? this.connect(item) : null;
     if (isLayer) {
       this.chronology.unshift(item);
-      this.configuration.unshift([item.__getIONeurones('input'), item.__getIONeurones('output')]);
+      this.configuration.unshift([item.__getIONeurones('input').length, item.__getIONeurones('output').length]);
     } else {
       this.chronology = item.chronology.concat(this.chronology);
       this.configuration = item.configuration.concat(this.configuration);

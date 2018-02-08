@@ -9,6 +9,7 @@ module.exports = class {
     this.neurones = new Array();
     this.order = {type: 'forward', seed: undefined};
     this.forwardCount = 0;
+    this.meta = {type: 'layer'};
   };
 
   setFiringOrder (order, seed) {
