@@ -51,7 +51,7 @@ function enumerateTypes (lossFunction) {
 
     case "cross-entropy":
       ret.evaluate = function (y, yhat) {return -y * Math.log(yhat + 10e-30)};
-      ret.derivative = function (y, yhat) {return (yhat - y)};
+      ret.derivative = function (y, yhat) {return -yhat/y};
       break;
 
     case "linear":
@@ -81,7 +81,7 @@ function enumerateTypes (lossFunction) {
 
     case "log-cosh":
       ret.evaluate = function (y, yhat) {return Math.log(Math.cosh(y - yhat))};
-      ret.derivative = function (y, yhat) {return -(Math.log(Math.E) * Math.sinh(y - yhat))/Math.cosh(y - yhat)};
+      ret.derivative = function (y, yhat) {return -Math.tanh(y - yhat)};
       break;
 
     default:
