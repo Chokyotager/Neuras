@@ -30,6 +30,7 @@ module.exports = class {
     if (!out) {
       throw "[Neuras] Invalid loss function switch!";
     };
+    return this;
   };
 
   batchTrain (inputs, outputs, rate, batch) {
@@ -108,6 +109,7 @@ module.exports = class {
       throw "[Neuras] Clip cannot be negative!";
     };
     this.gradient_clip = clip;
+    return this;
   };
 
   train (input, expected, rate) {
