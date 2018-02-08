@@ -45,7 +45,6 @@ module.exports = class {
 
           for (var i = 0; i < m.length; i++) {
             var nx = Math.sqrt(Math.abs(m[i]) + 10e-30 + this.cache.prev[i]);
-            console.log(nx);
             n.push(nx);
             p.push(1/nx * m[i]);
           };
