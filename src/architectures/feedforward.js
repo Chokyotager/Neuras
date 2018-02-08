@@ -8,7 +8,9 @@ module.exports = function (layers, squash, bias_probability, seed) {
 
   typeof bias_probability !== 'number' ? bias_probability = 0.5 : null;
 
-  for (var i = 0; i < layers.length; i++) {
+  layered.push(new Layer().addNeurones(layers[0], 'identity'));
+
+  for (var i = 0; i < layers.length - 1; i++) {
     layered.push(new Layer().addNeurones(layers[i], squash).addBiases(bias_probability, false, seed));
   };
 
