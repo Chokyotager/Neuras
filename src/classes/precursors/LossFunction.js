@@ -54,21 +54,6 @@ function enumerateTypes (lossFunction) {
       ret.derivative = function (y, yhat) {return -yhat/y};
       break;
 
-    case "linear":
-      ret.evaluate = function (y, yhat) {return y - yhat};
-      ret.derivative = function (y, yhat) {return -1};
-      break;
-
-    case "mean-cubed":
-      ret.evaluate = function (y, yhat) {return 1/3 * Math.pow((y - yhat), 3)};
-      ret.derivative = function (y, yhat) {return -Math.pow((y - yhat), 2)};
-      break;
-
-    case "mean-quad":
-      ret.evaluate = function (y, yhat) {return 1/4 * Math.pow((y - yhat), 4)};
-      ret.derivative = function (y, yhat) {return -Math.pow((y - yhat), 3)};
-      break;
-
     case "abs":
       ret.evaluate = function (y, yhat) {return Math.abs(y - yhat)};
       ret.derivative = function (y, yhat) {return (y-yhat) !== 0 ? -(y-yhat)/Math.abs(y-yhat) : 0};
