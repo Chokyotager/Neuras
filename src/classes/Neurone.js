@@ -137,33 +137,6 @@ module.exports = class extends Protoneurone {
     };
   };
 
-  connect (unit, weight) {
-    var unweightedInstance = unit.meta.weighted == false;
-    var weightedInstance = unit.meta.weighted == true;
-    if (!unweightedInstance && !weightedInstance) {
-      throw "[Neuras] Inappropriate connection (to) instance.";
-    };
-
-    if (unit.meta.max_connections < unit.backconnections.length + 1) {
-      throw "[Neuras] Unit can only hold " + unit.meta.max_connections + " connection" + ((unit.meta.max_connections !== 1) ? "s" : "") + "! Stack-trace to find unit!"
-    };
-
-    if (unit.meta.type === 'buffer') {
-      unit.backconnections.push(this);
-      for (var i = 0; i < unit.connections.length; i++) {
-        this.connect(unit.connections[i], weight);
-      };
-    } else if (unweightedInstance) {
-          unit.backconnections.push({neurone: this});
-      } else {
-        if (typeof weight !== 'number') {
-          weight = 2 * (Math.random()-.5);
-        };
-        unit.backconnections.push({neurone: this, weight: weight, dropout: false, frozen: false, local_trainrate: 1});
-      };
-    return this;
-  };
-
   freeze (probability, seed) {
     // freezes weights of the neurone
 
