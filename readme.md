@@ -2,6 +2,6 @@
 Neuras is a private research-oriented Neural Network library coded in JavaScript.
 
 ## Details ##
-Author: Paige L. (@ChocoParrot)
+Author: @ChocoParrot
 
 Contributor(s): Robbe Pincket (@Kroppeb)
